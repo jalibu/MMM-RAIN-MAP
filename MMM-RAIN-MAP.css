@@ -1,0 +1,10 @@
+#rain-map-time {
+	position: absolute;
+	top: 10px;
+	background: #ccc;
+	padding: 8px;
+	z-index: 9;
+	opacity: 0.75;
+	font-weight: bold;
+	color: #000;
+}

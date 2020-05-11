@@ -4,16 +4,18 @@
 
 Module.register("MMM-RAIN-MAP", {
 	defaults: {
-		height: "320px",
-		width: "320px",
+		height: "420px",
+		width: "420px",
 		key: "",
 		lat: 49.422,
 		lng: 8.69,
 		disableDefaultUI: true,
 		backgroundColor: "#ccc",
-		zoom: 7,
+		zoom: 8,
 		mapTypeId: "terrain",
-		updateIntervalInSeconds: 601,
+		updateIntervalInSeconds: 5,
+		animationSpeed: 800,
+		onlyOnRain: false,
 	},
 	map: "",
 	timestamps: [],
@@ -76,26 +78,49 @@ Module.register("MMM-RAIN-MAP", {
 		};
 
 		let app = document.createElement("div");
-		let markup = `<div id="rain-map-time" style="position: absolute;
-        top: 10px;
-        background: #fff;
-        padding: 8px;
-        z-index: 9;
-        opacity: 0.75;
-        font-weight: bold;"></div>`;
+		let markup = `<div id="rain-map-time"></div>`;
 		markup += `<div id="rain-map-map" style="height: ${this.config.height}; width: ${this.config.width}"></div>`;
 
 		app.style.height = this.config.height;
 		app.style.width = this.config.width;
 		app.style.position = "relative";
+		app.setAttribute("id", "rain-map-wrapper");
 		app.innerHTML = markup;
 		return app;
 	},
 
 	updateData: function () {
-		/**
-		 * Load actual radar animation frames timestamps from RainViewer API
-		 */
+		if (self.config.onlyOnRain) {
+			let weaterIcons = document.querySelectorAll(
+				"div.currentweather span.wi.weathericon"
+			);
+			document.getElementById("rain-map-wrapper").style.visibility = "hidden";
+			if (weaterIcons && weaterIcons.length === 1) {
+				const icon = weaterIcons[0];
+				let hasRainIcon = false;
+				const iconsToShow = [
+					"wi-rain",
+					"wi-thunderstorm",
+					"wi-snow",
+					"wi-night-rain",
+					"wi-night-thunderstorm",
+					"wi-night-snow",
+				];
+				iconsToShow.forEach((iconName) => {
+					hasRainIcon = hasRainIcon || icon.classList.contains(iconName);
+				});
+				if (hasRainIcon) {
+					this.sendRequest();
+					document.getElementById("rain-map-wrapper").style.visibility =
+						"visible";
+				}
+			}
+		} else {
+			this.sendRequest();
+		}
+	},
+
+	sendRequest: function () {
 		const self = this;
 		var apiRequest = new XMLHttpRequest();
 		apiRequest.open("GET", "https://api.rainviewer.com/public/maps.json", true);
@@ -105,7 +130,6 @@ Module.register("MMM-RAIN-MAP", {
 			self.showFrame(-1);
 			self.stop();
 			self.play(self);
-			console.log("ts", self.timestamps);
 		};
 		apiRequest.send();
 	},
@@ -173,7 +197,7 @@ Module.register("MMM-RAIN-MAP", {
 					].join("");
 				},
 				tileSize: new google.maps.Size(256, 256),
-				opacity: 0.01,
+				opacity: 0.025,
 			});
 			this.map.overlayMapTypes.push(this.radarLayers[ts]);
 		}
@@ -185,7 +209,7 @@ Module.register("MMM-RAIN-MAP", {
 		// Main animation driver. Run this function every 500 ms
 		this.animationTimer = setTimeout(function () {
 			self.play(self);
-		}, 800);
+		}, self.config.animationSpeed);
 	},
 
 	stop: function () {
