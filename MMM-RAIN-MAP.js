@@ -7,21 +7,25 @@ Module.register("MMM-RAIN-MAP", {
 		height: "420px",
 		width: "420px",
 		key: "",
-		lat: 49.422,
-		lng: 8.69,
+		lat: 50,
+		lng: 8.27,
 		disableDefaultUI: true,
 		backgroundColor: "#ccc",
 		zoom: 8,
 		mapTypeId: "terrain",
 		updateIntervalInSeconds: 60,
-		animationSpeed: 800,
-		opacity: 0.5,
+		animationSpeed: 600,
+		opacity: 0.6,
 		onlyOnRain: false,
+		displayTime: true,
+		markers: [],
+		zoomOutEach: 2,
+		zoomOutLevel: 3,
 	},
 	map: "",
 	timestamps: [],
 	radarLayers: [],
-
+	round: 1,
 	animationPosition: 0,
 	animationTimer: false,
 	start: function () {
@@ -31,6 +35,13 @@ Module.register("MMM-RAIN-MAP", {
 
 	getStyles: function () {
 		return ["MMM-RAIN-MAP.css"];
+	},
+
+	getTranslations: function () {
+		return {
+			en: "translations/en.json",
+			de: "translations/de.json",
+		};
 	},
 
 	getDom: function () {
@@ -56,20 +67,25 @@ Module.register("MMM-RAIN-MAP", {
 				disableDefaultUI: self.config.disableDefaultUI,
 				backgroundColor: self.config.backgroundColor,
 			});
-			new google.maps.Marker({
-				position: {
-					lat: self.config.lat,
-					lng: self.config.lng,
-				},
-				map: self.map,
-				title: "",
+
+			self.config.markers.forEach((marker) => {
+				new google.maps.Marker({
+					position: {
+						lat: marker.lat,
+						lng: marker.lng,
+					},
+					map: self.map,
+				});
 			});
+
 			self.updateData();
 		};
 
 		let app = document.createElement("div");
-		let markup = `<div id="rain-map-time"></div>`;
-		markup += `<div id="rain-map-map" style="height: ${this.config.height}; width: ${this.config.width}"></div>`;
+		let markup = `<div id="rain-map-map" style="height: ${this.config.height}; width: ${this.config.width}"></div>`;
+		if (this.config.displayTime) {
+			markup += `<div id="rain-map-time"></div>`;
+		}
 
 		app.style.height = this.config.height;
 		app.style.width = this.config.width;
@@ -164,10 +180,14 @@ Module.register("MMM-RAIN-MAP", {
 		}
 		this.radarLayers[nextTimestamp].setOpacity(this.config.opacity);
 
-		const time = new Date(nextTimestamp * 1000);
-		document.getElementById("rain-map-time").innerHTML = `${time.getHours()}:${
-			time.getMinutes() < 10 ? "0" + time.getMinutes() : time.getMinutes()
-		} Uhr`;
+		if (this.config.displayTime) {
+			const time = new Date(nextTimestamp * 1000);
+			document.getElementById(
+				"rain-map-time"
+			).innerHTML = `${time.getHours()}:${
+				time.getMinutes() < 10 ? "0" + time.getMinutes() : time.getMinutes()
+			} ${this.translate("time")}`;
+		}
 	},
 
 	addLayer: function (ts) {
@@ -193,6 +213,21 @@ Module.register("MMM-RAIN-MAP", {
 
 	play: function (self) {
 		self.showFrame(this.animationPosition + 1);
+		if (self.config.zoomOutEach > 0) {
+			if (self.config.zoomOutEach === self.round) {
+				if (this.animationPosition + 1 === this.timestamps.length) {
+					if (self.map.getZoom() === self.config.zoom) {
+						self.map.setZoom(self.config.zoom - self.config.zoomOutLevel);
+					} else {
+						self.map.setZoom(self.config.zoom);
+					}
+				}
+				self.round = 1;
+			} else {
+				self.round++;
+			}
+		}
+
 		// Main animation driver. Run this function every 500 ms
 		this.animationTimer = setTimeout(function () {
 			self.play(self);
