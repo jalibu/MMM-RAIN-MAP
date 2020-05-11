@@ -13,8 +13,9 @@ Module.register("MMM-RAIN-MAP", {
 		backgroundColor: "#ccc",
 		zoom: 8,
 		mapTypeId: "terrain",
-		updateIntervalInSeconds: 5,
+		updateIntervalInSeconds: 60,
 		animationSpeed: 800,
+		opacity: 0.5,
 		onlyOnRain: false,
 	},
 	map: "",
@@ -54,17 +55,6 @@ Module.register("MMM-RAIN-MAP", {
 				styles: self.styledMapType,
 				disableDefaultUI: self.config.disableDefaultUI,
 				backgroundColor: self.config.backgroundColor,
-				clickableIcons: false,
-				fullscreenControl: false,
-				panControl: false,
-				panControlOptions: false,
-				mapTypeControl: false,
-				mapTypeControlOptions: false,
-				streetViewControl: false,
-				streetViewControlOptions: false,
-				scaleControlOptions: false,
-				zoomControl: false,
-				zoomControlOptions: false,
 			});
 			new google.maps.Marker({
 				position: {
@@ -147,8 +137,6 @@ Module.register("MMM-RAIN-MAP", {
 
 		this.changeRadarPosition(nextPosition);
 
-		// preload next next frame (typically, +1 frame)
-		// if don't do that, the animation will be blinking at the first loop
 		this.changeRadarPosition(nextPosition + preloadingDirection, true);
 	},
 
@@ -174,7 +162,7 @@ Module.register("MMM-RAIN-MAP", {
 		if (this.radarLayers[currentTimestamp]) {
 			this.radarLayers[currentTimestamp].setOpacity(0);
 		}
-		this.radarLayers[nextTimestamp].setOpacity(100);
+		this.radarLayers[nextTimestamp].setOpacity(this.config.opacity);
 
 		const time = new Date(nextTimestamp * 1000);
 		document.getElementById("rain-map-time").innerHTML = `${time.getHours()}:${
@@ -197,7 +185,7 @@ Module.register("MMM-RAIN-MAP", {
 					].join("");
 				},
 				tileSize: new google.maps.Size(256, 256),
-				opacity: 0.025,
+				opacity: 0.0001,
 			});
 			this.map.overlayMapTypes.push(this.radarLayers[ts]);
 		}
@@ -205,7 +193,6 @@ Module.register("MMM-RAIN-MAP", {
 
 	play: function (self) {
 		self.showFrame(this.animationPosition + 1);
-
 		// Main animation driver. Run this function every 500 ms
 		this.animationTimer = setTimeout(function () {
 			self.play(self);
