@@ -1,6 +1,7 @@
 # MMM-RAIN-MAP (Beta)
 
 This is another Rain Radar Map for [Magic Mirror](https://magicmirror.builders/).  
+It is inspired by [MMM-RAIN-RADAR by jojoduquartier](https://github.com/jojoduquartier/MMM-RAIN-RADAR) but uses [Rainviewer API example](https://github.com/rainviewer/rainviewer-api-example) instead of an iframe.  
 Click here for the Magic Mirror [Forum Thread](https://forum.magicmirror.builders/topic/12507/mmm-jast-just-another-stock-ticker)
 
 ## Features
