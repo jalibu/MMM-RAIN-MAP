@@ -1,0 +1,74 @@
+# MMM-RAIN-MAP (Beta)
+
+This is another Rain Radar Map for [Magic Mirror](https://magicmirror.builders/).  
+Click here for the Magic Mirror [Forum Thread](https://forum.magicmirror.builders/topic/12507/mmm-jast-just-another-stock-ticker)
+
+## Features
+
+- Shows Rainviewer.com rain data on Google Maps.
+- Option to support multiple, alternating zoom levels
+- Option to only show on rain (dependency to currentweather module)
+- Option to add markers on map
+
+## Installing the Module
+
+Navigate to the MagicMirror subfolder "modules" and execute the following command  
+`git clone https://github.com/jalibu/MMM-RAIN-MAP.git`
+
+## Google API Key
+
+Obtain an api at [Google Developer's page](https://developers.google.com/maps/documentation/javascript/).
+
+## Usage
+
+To use this module, add it to the modules array in the `config/config.js` file:
+
+### Sample
+
+```javascript
+{
+	module: "MMM-Jast",
+	position: "top_left",
+	config: {
+		height: "420px",
+		width: "420px",
+		key: "",
+		lat: 50,
+		lng: 8.27,
+		disableDefaultUI: true,
+		backgroundColor: "#ccc",
+		zoom: 8,
+		mapTypeId: "terrain",
+		updateIntervalInSeconds: 60,
+		animationSpeed: 600,
+		opacity: 0.6,
+		onlyOnRain: false,
+		displayTime: true,
+		markers: [{ lat: 49.9, lng: 8.27 }],
+		zoomOutEach: 2,
+		zoomOutLevel: 3,
+	}
+}
+```
+
+### Options
+
+| Option                    | Description                                                                                                                                                                                                 |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `key`                     | _Required_ Google api key.                                                                                                                                                                                  |
+| `lat`                     | _Required_ Latitude used to center the map.<br><br>**Type:** `float`                                                                                                                                        |
+| `lng`                     | _Required_ Longitude used to center the map.<br><br>**Type:** `float`                                                                                                                                       |
+| `height`                  | Height of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `420px`                                                                                                                      |
+| `width`                   | Width of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `420px`                                                                                                                       |
+| `zoom`                    | Zoom value to display from lat/lng. <br><br>**Type:** `integer` <br> **Default value:** `8`                                                                                                                 |
+| `mapTypeId`               | The map type to display (roadmap, satellite, hybrid, terrain). <br><br>**Type:** `string` <br> **Default value:** `terrain`                                                                                 |  |
+| `disableDefaultUI`        | Disable default UI buttons (Zoom and Street View). <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                               |
+| `markers`                 | Additional markers in the map as an array. See example.                                                                                                                                                     |
+| `backgroundColor`         | Backgound behind the map.Can be set to transparent (`'hsla(0, 0%, 0%, 0)'`) or left at black (default). <br><br>**Type:** `string` <br> **Default value:** `'rgba(0, 0, 0, 0)'`                             |
+| `updateIntervalInSeconds` | Update interval for fetching new radar frames in seconds. (New frames are released every 10 minutes) <br><br>**Type:** `int` <br> **Default value:** `300`                                                  |
+| `animationSpeed`          | Determines how fast the frames are played (time per frame in milliseconds). <br><br>**Type:** `int` <br> **Default value:** `600`                                                                           |
+| `opacity`                 | Opacity of radar overlay on map. <br><br>**Type:** `float` <br> **Default value:** `0.6`                                                                                                                    |
+| `onlyOnRain`              | If set to true, the map is only shown when currentweather module shows rain or show icon. <br><br>**Type:** `boolean` <br> **Default value:** `false`                                                       |
+| `displayTime`             | Show time for each frame. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                        |
+| `zoomOutEach`             | If set to a number higher than 0, the map zooms out after n rotations of frames. It zooms back to default zoom level after the same number of rotations.<br><br>**Type:** `int` <br> **Default value:** `0` |
+| `zoomOutLevel`            | If zoomOutEach is higher 0, this setting determines how far the map zooms out.<br><br>**Type:** `int` <br> **Default value:** `600`                                                                         |
