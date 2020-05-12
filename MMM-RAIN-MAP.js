@@ -7,7 +7,7 @@ Module.register("MMM-RAIN-MAP", {
 		animationSpeed: 600,
 		backgroundColor: "rgba(0, 0, 0, 0)",
 		disableDefaultUI: true,
-		displayClockSymbol: false,
+		displayClockSymbol: true,
 		displayTime: true,
 		height: "420px",
 		iconsToShow: [
