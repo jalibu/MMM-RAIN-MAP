@@ -28,7 +28,7 @@ Module.register("MMM-RAIN-MAP", {
 		updateIntervalInSeconds: 300,
 		width: "420px",
 		zoom: 8,
-		zoomOutEach: 2,
+		zoomOutEach: 0,
 		zoomOutLevel: 2,
 	},
 	animationPosition: 0,
