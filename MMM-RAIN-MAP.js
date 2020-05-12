@@ -4,57 +4,68 @@
 
 Module.register("MMM-RAIN-MAP", {
 	defaults: {
+		animationSpeed: 600,
+		backgroundColor: "rgba(0, 0, 0, 0)",
+		disableDefaultUI: true,
+		displayClockSymbol: false,
+		displayTime: true,
+		height: "420px",
+		iconsToShow: [
+			"wi-rain",
+			"wi-thunderstorm",
+			"wi-snow",
+			"wi-night-rain",
+			"wi-night-thunderstorm",
+			"wi-night-snow",
+		],
 		key: "",
 		lat: 50,
 		lng: 8.27,
-		height: "420px",
+		mapTypeId: "terrain",
+		markers: [],
+		onlyOnRain: false,
+		opacity: 0.65,
+		updateIntervalInSeconds: 300,
 		width: "420px",
 		zoom: 8,
-		mapTypeId: "terrain",
-		disableDefaultUI: true,
-		markers: [],
-		backgroundColor: "rgba(0, 0, 0, 0)",
-		updateIntervalInSeconds: 300,
-		animationSpeed: 600,
-		opacity: 0.6,
-		onlyOnRain: false,
-		displayTime: true,
-		zoomOutEach: 0,
-		zoomOutLevel: 3,
+		zoomOutEach: 2,
+		zoomOutLevel: 2,
 	},
-	map: "",
-	timestamps: [],
-	radarLayers: [],
-	round: 1,
 	animationPosition: 0,
 	animationTimer: false,
-	start: function () {
-		self = this;
-		this.scheduleUpdate(this.updateInterval);
-	},
+	loopNumber: 1,
+	map: null,
+	radarLayers: [],
+	timestamps: [],
 
-	getStyles: function () {
+	getStyles: () => {
 		return ["MMM-RAIN-MAP.css"];
 	},
 
-	getTranslations: function () {
+	getScripts: () => {
+		return ["moment.js", "moment-timezone.js"];
+	},
+
+	getTranslations: () => {
 		return {
 			en: "translations/en.json",
 			de: "translations/de.json",
 		};
 	},
 
+	start: function () {
+		this.scheduleUpdate(this.updateInterval);
+	},
+
 	getDom: function () {
-		var script = document.createElement("script");
+		const script = document.createElement("script");
 		script.type = "text/javascript";
-		script.src =
-			"https://maps.googleapis.com/maps/api/js?key=" + this.config.key;
+		script.src = `https://maps.googleapis.com/maps/api/js?key=${this.config.key}`;
 		script.setAttribute("defer", "");
 		script.setAttribute("async", "");
 		document.body.appendChild(script);
 
-		var self = this;
-
+		const self = this;
 		script.onload = function () {
 			self.map = new google.maps.Map(document.getElementById("rain-map-map"), {
 				zoom: self.config.zoom,
@@ -80,38 +91,34 @@ Module.register("MMM-RAIN-MAP", {
 			self.updateData();
 		};
 
-		let app = document.createElement("div");
-		let markup = `<div id="rain-map-map" style="height: ${this.config.height}; width: ${this.config.width}"></div>`;
-		if (this.config.displayTime) {
-			markup += `<div id="rain-map-time"></div>`;
-		}
-
+		const app = document.createElement("div");
 		app.style.height = this.config.height;
 		app.style.width = this.config.width;
 		app.style.position = "relative";
 		app.setAttribute("id", "rain-map-wrapper");
+
+		let markup = `<div id="rain-map-map" style="height: ${this.config.height}; width: ${this.config.width}"></div>`;
+		if (this.config.displayTime) {
+			markup += `<div class="rain-map-time-wrapper">
+						${this.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ""}
+						<span id="rain-map-time"></span>
+					</div>`;
+		}
 		app.innerHTML = markup;
+
 		return app;
 	},
 
 	updateData: function () {
 		if (self.config.onlyOnRain) {
-			let weaterIcons = document.querySelectorAll(
+			const weaterIcons = document.querySelectorAll(
 				"div.currentweather span.wi.weathericon"
 			);
-			document.getElementById("rain-map-wrapper").style.visibility = "hidden";
 			if (weaterIcons && weaterIcons.length === 1) {
+				document.getElementById("rain-map-wrapper").style.visibility = "hidden";
 				const icon = weaterIcons[0];
 				let hasRainIcon = false;
-				const iconsToShow = [
-					"wi-rain",
-					"wi-thunderstorm",
-					"wi-snow",
-					"wi-night-rain",
-					"wi-night-thunderstorm",
-					"wi-night-snow",
-				];
-				iconsToShow.forEach((iconName) => {
+				self.config.iconsToShow.forEach((iconName) => {
 					hasRainIcon = hasRainIcon || icon.classList.contains(iconName);
 				});
 				if (hasRainIcon) {
@@ -127,11 +134,12 @@ Module.register("MMM-RAIN-MAP", {
 
 	sendRequest: function () {
 		const self = this;
-		var apiRequest = new XMLHttpRequest();
+		const apiRequest = new XMLHttpRequest();
 		apiRequest.open("GET", "https://api.rainviewer.com/public/maps.json", true);
 		apiRequest.onload = function (e) {
 			// save available timestamps and show the latest frame: "-1" means "timestamp.lenght - 1"
 			self.timestamps = JSON.parse(apiRequest.response);
+			self.arrayData = [];
 			self.showFrame(-1);
 			self.stop();
 			self.play(self);
@@ -147,11 +155,10 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	showFrame: function (nextPosition) {
-		var preloadingDirection =
+		const preloadingDirection =
 			nextPosition - this.animationPosition > 0 ? 1 : -1;
 
 		this.changeRadarPosition(nextPosition);
-
 		this.changeRadarPosition(nextPosition + preloadingDirection, true);
 	},
 
@@ -163,8 +170,8 @@ Module.register("MMM-RAIN-MAP", {
 			position += this.timestamps.length;
 		}
 
-		var currentTimestamp = this.timestamps[this.animationPosition];
-		var nextTimestamp = this.timestamps[position];
+		const currentTimestamp = this.timestamps[this.animationPosition];
+		const nextTimestamp = this.timestamps[position];
 
 		this.addLayer(nextTimestamp);
 
@@ -180,12 +187,18 @@ Module.register("MMM-RAIN-MAP", {
 		this.radarLayers[nextTimestamp].setOpacity(this.config.opacity);
 
 		if (this.config.displayTime) {
-			const time = new Date(nextTimestamp * 1000);
-			document.getElementById(
-				"rain-map-time"
-			).innerHTML = `${time.getHours()}:${
-				time.getMinutes() < 10 ? "0" + time.getMinutes() : time.getMinutes()
-			} ${this.translate("time")}`;
+			const time = moment(nextTimestamp * 1000);
+			if (this.config.timezone) {
+				time.tz(this.config.timezone);
+			}
+			let hourSymbol = "HH";
+			if (this.config.timeFormat !== 24) {
+				hourSymbol = "h";
+			}
+
+			document.getElementById("rain-map-time").innerHTML = `${time.format(
+				hourSymbol + ":mm"
+			)}`;
 		}
 	},
 
@@ -213,21 +226,24 @@ Module.register("MMM-RAIN-MAP", {
 	play: function (self) {
 		self.showFrame(this.animationPosition + 1);
 		if (self.config.zoomOutEach > 0) {
-			if (self.config.zoomOutEach === self.round) {
+			if (self.config.zoomOutEach === self.loopNumber) {
 				if (this.animationPosition + 1 === this.timestamps.length) {
 					if (self.map.getZoom() === self.config.zoom) {
-						self.map.setZoom(self.config.zoom - self.config.zoomOutLevel);
+						self.map.setZoom(
+							self.map.getZoom() === self.config.zoom
+								? self.config.zoom - self.config.zoomOutLevel
+								: self.config.zoom
+						);
 					} else {
 						self.map.setZoom(self.config.zoom);
 					}
 				}
-				self.round = 1;
+				self.loopNumber = 1;
 			} else {
-				self.round++;
+				self.loopNumber++;
 			}
 		}
 
-		// Main animation driver. Run this function every 500 ms
 		this.animationTimer = setTimeout(function () {
 			self.play(self);
 		}, self.config.animationSpeed);

@@ -1,4 +1,4 @@
-#rain-map-time {
+.rain-map-time-wrapper {
 	position: absolute;
 	top: 10px;
 	background: #ccc;
@@ -8,4 +8,7 @@
 	font-weight: bold;
 	color: #000;
 	font-size: 22px;
+}
+.rain-map-time-wrapper i {
+	margin-right: 6px;
 }

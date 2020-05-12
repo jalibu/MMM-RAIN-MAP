@@ -31,23 +31,21 @@ To use this module, add it to the modules array in the `config/config.js` file:
 	module: "MMM-RAIN-MAP",
 	position: "top_left",
 	config: {
+		animationSpeed: 600,
 		height: "420px",
 		width: "420px",
-		key: "",
+		key: "<INSERT_HERE>",
 		lat: 50,
 		lng: 8.27,
-		disableDefaultUI: true,
-		backgroundColor: "#ccc",
-		zoom: 8,
 		mapTypeId: "terrain",
-		updateIntervalInSeconds: 60,
-		animationSpeed: 600,
-		opacity: 0.6,
-		onlyOnRain: false,
-		displayTime: true,
-		markers: [{ lat: 49.9, lng: 8.27 }],
+		markers: [{ lat: 50, lng: 8.27 }],
+		onlyOnRain: true,
+		opacity: 0.75,
+		showClockSymbol: false,
+		updateIntervalInSeconds: 300,
+		zoom: 8,
 		zoomOutEach: 2,
-		zoomOutLevel: 3,
+		zoomOutLevel: 2,
 	}
 }
 ```
@@ -71,5 +69,6 @@ To use this module, add it to the modules array in the `config/config.js` file:
 | `opacity`                 | Opacity of radar overlay on map. <br><br>**Type:** `float` <br> **Default value:** `0.6`                                                                                                                    |
 | `onlyOnRain`              | If set to true, the map is only shown when currentweather module shows rain or show icon. <br><br>**Type:** `boolean` <br> **Default value:** `false`                                                       |
 | `displayTime`             | Show time for each frame. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                        |
+| `displayClockSymbol`      | Show clock symbol before the time. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                               |
 | `zoomOutEach`             | If set to a number higher than 0, the map zooms out after n rotations of frames. It zooms back to default zoom level after the same number of rotations.<br><br>**Type:** `int` <br> **Default value:** `0` |
-| `zoomOutLevel`            | If zoomOutEach is higher 0, this setting determines how far the map zooms out.<br><br>**Type:** `int` <br> **Default value:** `600`                                                                         |
+| `zoomOutLevel`            | If zoomOutEach is higher 0, this setting determines how far the map zooms out.<br><br>**Type:** `int` <br> **Default value:** `3`                                                                           |
