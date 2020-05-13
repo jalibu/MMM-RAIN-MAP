@@ -25,6 +25,7 @@ Module.register("MMM-RAIN-MAP", {
 		markers: [],
 		onlyOnRain: false,
 		opacity: 0.65,
+		timeFormat: config.timeFormat || "24",
 		updateIntervalInSeconds: 300,
 		width: "420px",
 		zoom: 8,
