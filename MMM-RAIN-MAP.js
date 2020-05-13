@@ -110,21 +110,22 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	updateData: function () {
-		if (self.config.onlyOnRain) {
+		if (this.config.onlyOnRain) {
 			const weaterIcons = document.querySelectorAll(
 				"div.currentweather span.wi.weathericon"
 			);
 			if (weaterIcons && weaterIcons.length === 1) {
-				document.getElementById("rain-map-wrapper").style.visibility = "hidden";
 				const icon = weaterIcons[0];
 				let hasRainIcon = false;
-				self.config.iconsToShow.forEach((iconName) => {
+				this.config.iconsToShow.forEach((iconName) => {
 					hasRainIcon = hasRainIcon || icon.classList.contains(iconName);
 				});
 				if (hasRainIcon) {
 					this.sendRequest();
-					document.getElementById("rain-map-wrapper").style.visibility =
-						"visible";
+					this.show();
+				} else {
+					this.hide();
+					this.stop();
 				}
 			}
 		} else {
