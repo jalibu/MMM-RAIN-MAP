@@ -8,7 +8,7 @@ Module.register("MMM-RAIN-MAP", {
 		backgroundColor: "rgba(0, 0, 0, 0)",
 		disableDefaultUI: true,
 		displayClockSymbol: true,
-		displayTime: true,
+		displayTime: false,
 		height: "420px",
 		iconsToShow: [
 			"wi-rain",
@@ -21,6 +21,7 @@ Module.register("MMM-RAIN-MAP", {
 		key: "",
 		lat: 50,
 		lng: 8.27,
+		map: "OSM",
 		mapTypeId: "terrain",
 		markers: [],
 		onlyOnRain: false,
@@ -40,7 +41,11 @@ Module.register("MMM-RAIN-MAP", {
 	timestamps: [],
 
 	getStyles: () => {
-		return ["MMM-RAIN-MAP.css"];
+		let styles = ["MMM-RAIN-MAP.css"];
+		//if (this.config.map === "OSM") {
+		styles.push("https://unpkg.com/leaflet@1.6.0/dist/leaflet.css");
+		//}
+		return styles;
 	},
 
 	getScripts: () => {
@@ -59,38 +64,64 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	getDom: function () {
-		const script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = `https://maps.googleapis.com/maps/api/js?key=${this.config.key}`;
-		script.setAttribute("defer", "");
-		script.setAttribute("async", "");
-		document.body.appendChild(script);
-
 		const self = this;
-		script.onload = function () {
-			self.map = new google.maps.Map(document.getElementById("rain-map-map"), {
-				zoom: self.config.zoom,
-				mapTypeId: self.config.mapTypeId,
-				center: {
-					lat: self.config.lat,
-					lng: self.config.lng,
-				},
-				disableDefaultUI: self.config.disableDefaultUI,
-				backgroundColor: self.config.backgroundColor,
-			});
+		if (self.config.map === "OSM") {
+			const script = document.createElement("script");
+			script.type = "text/javascript";
+			script.src = "https://unpkg.com/leaflet@1.6.0/dist/leaflet.js";
+			script.setAttribute("defer", "");
+			script.setAttribute("async", "");
+			document.body.appendChild(script);
+			script.onload = function () {
+				self.map = L.map("rain-map-map").setView(
+					[self.config.lat, self.config.lng],
+					self.config.zoom
+				);
+				L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+					self.map
+				);
 
-			self.config.markers.forEach((marker) => {
-				new google.maps.Marker({
-					position: {
-						lat: marker.lat,
-						lng: marker.lng,
-					},
-					map: self.map,
+				self.config.markers.forEach((marker) => {
+					L.marker([marker.lat, marker.lng]).addTo(self.map);
 				});
-			});
+				self.updateData();
+			};
+		} else {
+			const script = document.createElement("script");
+			script.type = "text/javascript";
+			script.src = `https://maps.googleapis.com/maps/api/js?key=${this.config.key}`;
+			script.setAttribute("defer", "");
+			script.setAttribute("async", "");
+			document.body.appendChild(script);
 
-			self.updateData();
-		};
+			script.onload = function () {
+				self.map = new google.maps.Map(
+					document.getElementById("rain-map-map"),
+					{
+						zoom: self.config.zoom,
+						mapTypeId: self.config.mapTypeId,
+						center: {
+							lat: self.config.lat,
+							lng: self.config.lng,
+						},
+						disableDefaultUI: self.config.disableDefaultUI,
+						backgroundColor: self.config.backgroundColor,
+					}
+				);
+
+				self.config.markers.forEach((marker) => {
+					new google.maps.Marker({
+						position: {
+							lat: marker.lat,
+							lng: marker.lng,
+						},
+						map: self.map,
+					});
+				});
+
+				self.updateData();
+			};
+		}
 
 		const app = document.createElement("div");
 		app.style.height = this.config.height;
@@ -206,22 +237,38 @@ Module.register("MMM-RAIN-MAP", {
 
 	addLayer: function (ts) {
 		if (!this.radarLayers[ts]) {
-			this.radarLayers[ts] = new google.maps.ImageMapType({
-				getTileUrl: function (coord, zoom) {
-					return [
-						"https://tilecache.rainviewer.com/v2/radar/" + ts + "/256/",
-						zoom,
-						"/",
-						coord.x,
-						"/",
-						coord.y,
-						"/2/1_1.png",
-					].join("");
-				},
-				tileSize: new google.maps.Size(256, 256),
-				opacity: 0.0001,
-			});
-			this.map.overlayMapTypes.push(this.radarLayers[ts]);
+			if (this.config.map === "OSM") {
+				this.radarLayers[ts] = new L.TileLayer(
+					"https://tilecache.rainviewer.com/v2/radar/" +
+						ts +
+						"/256/{z}/{x}/{y}/2/1_1.png",
+					{
+						tileSize: 256,
+						opacity: 0.001,
+						zIndex: ts,
+					}
+				);
+			} else {
+				this.radarLayers[ts] = new google.maps.ImageMapType({
+					getTileUrl: function (coord, zoom) {
+						return [
+							"https://tilecache.rainviewer.com/v2/radar/" + ts + "/256/",
+							zoom,
+							"/",
+							coord.x,
+							"/",
+							coord.y,
+							"/2/1_1.png",
+						].join("");
+					},
+					tileSize: new google.maps.Size(256, 256),
+					opacity: 0.0001,
+				});
+				this.map.overlayMapTypes.push(this.radarLayers[ts]);
+			}
+		}
+		if (this.config.map === "OSM" && !this.map.hasLayer(this.radarLayers[ts])) {
+			this.map.addLayer(this.radarLayers[ts]);
 		}
 	},
 
