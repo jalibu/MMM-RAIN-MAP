@@ -41,15 +41,14 @@ Module.register("MMM-RAIN-MAP", {
 	timestamps: [],
 
 	getStyles: () => {
-		let styles = ["MMM-RAIN-MAP.css"];
-		//if (this.config.map === "OSM") {
-		styles.push("https://unpkg.com/leaflet@1.6.0/dist/leaflet.css");
-		//}
-		return styles;
+		return [
+			"MMM-RAIN-MAP.css",
+			"https://unpkg.com/leaflet@1.6.0/dist/leaflet.css",
+		];
 	},
 
-	getScripts: () => {
-		return ["moment.js", "moment-timezone.js"];
+	getScripts: function () {
+		return [this.file("utils.js"), "moment.js", "moment-timezone.js"];
 	},
 
 	getTranslations: () => {
@@ -64,81 +63,14 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	getDom: function () {
-		const self = this;
-		if (self.config.map === "OSM") {
-			const script = document.createElement("script");
-			script.type = "text/javascript";
-			script.src = "https://unpkg.com/leaflet@1.6.0/dist/leaflet.js";
-			script.setAttribute("defer", "");
-			script.setAttribute("async", "");
-			document.body.appendChild(script);
-			script.onload = function () {
-				self.map = L.map("rain-map-map").setView(
-					[self.config.lat, self.config.lng],
-					self.config.zoom
-				);
-				L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
-					self.map
-				);
-
-				self.config.markers.forEach((marker) => {
-					L.marker([marker.lat, marker.lng]).addTo(self.map);
-				});
-				self.updateData();
-			};
+		const utils = new Utils(this);
+		if (this.config.map === "OSM") {
+			utils.initOSMap();
 		} else {
-			const script = document.createElement("script");
-			script.type = "text/javascript";
-			script.src = `https://maps.googleapis.com/maps/api/js?key=${this.config.key}`;
-			script.setAttribute("defer", "");
-			script.setAttribute("async", "");
-			document.body.appendChild(script);
-
-			script.onload = function () {
-				self.map = new google.maps.Map(
-					document.getElementById("rain-map-map"),
-					{
-						zoom: self.config.zoom,
-						mapTypeId: self.config.mapTypeId,
-						center: {
-							lat: self.config.lat,
-							lng: self.config.lng,
-						},
-						disableDefaultUI: self.config.disableDefaultUI,
-						backgroundColor: self.config.backgroundColor,
-					}
-				);
-
-				self.config.markers.forEach((marker) => {
-					new google.maps.Marker({
-						position: {
-							lat: marker.lat,
-							lng: marker.lng,
-						},
-						map: self.map,
-					});
-				});
-
-				self.updateData();
-			};
+			utils.initGoogleMap();
 		}
 
-		const app = document.createElement("div");
-		app.style.height = this.config.height;
-		app.style.width = this.config.width;
-		app.style.position = "relative";
-		app.setAttribute("id", "rain-map-wrapper");
-
-		let markup = `<div id="rain-map-map" style="height: ${this.config.height}; width: ${this.config.width}"></div>`;
-		if (this.config.displayTime) {
-			markup += `<div class="rain-map-time-wrapper">
-						${this.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ""}
-						<span id="rain-map-time"></span>
-					</div>`;
-		}
-		app.innerHTML = markup;
-
-		return app;
+		return utils.initMapWrapper();
 	},
 
 	updateData: function () {
