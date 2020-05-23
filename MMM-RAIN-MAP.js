@@ -9,6 +9,7 @@ Module.register("MMM-RAIN-MAP", {
 		disableDefaultUI: true,
 		displayClockSymbol: true,
 		displayTime: true,
+		extraDelayLastFrame: 2000,
 		height: "420px",
 		iconsToShow: [
 			"wi-rain",
@@ -118,30 +119,34 @@ Module.register("MMM-RAIN-MAP", {
 		}, self.config.updateIntervalInSeconds * 1000);
 	},
 
-	play: function (self) {
+	play: function () {
 		Utils.showFrame(this, this.animationPosition + 1);
-		if (self.config.zoomOutEach > 0) {
-			if (self.config.zoomOutEach === self.loopNumber) {
+		if (this.config.zoomOutEach > 0) {
+			if (this.config.zoomOutEach === this.loopNumber) {
 				if (this.animationPosition + 1 === this.timestamps.length) {
-					if (self.map.getZoom() === self.config.zoom) {
-						self.map.setZoom(
-							self.map.getZoom() === self.config.zoom
-								? self.config.zoom - self.config.zoomOutLevel
-								: self.config.zoom
+					if (this.map.getZoom() === this.config.zoom) {
+						this.map.setZoom(
+							this.map.getZoom() === this.config.zoom
+								? this.config.zoom - this.config.zoomOutLevel
+								: this.config.zoom
 						);
 					} else {
-						self.map.setZoom(self.config.zoom);
+						this.map.setZoom(this.config.zoom);
 					}
 				}
-				self.loopNumber = 1;
+				this.loopNumber = 1;
 			} else {
-				self.loopNumber++;
+				this.loopNumber++;
 			}
 		}
-
+		const self = this;
+		const timeOut =
+			this.animationPosition + 1 === this.timestamps.length
+				? this.config.animationSpeed + this.config.extraDelayLastFrame
+				: this.config.animationSpeed;
 		this.animationTimer = setTimeout(function () {
-			self.play(self);
-		}, self.config.animationSpeed);
+			self.play();
+		}, timeOut);
 	},
 
 	stop: function () {
