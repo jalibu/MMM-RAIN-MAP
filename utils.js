@@ -79,8 +79,8 @@ class Utils {
 	}
 
 	static addLayer(module, ts) {
-		if (!module.radarLayers[ts]) {
-			if (module.config.map.toUpperCase() === "GOOGLE") {
+		if (module.config.map.toUpperCase() === "GOOGLE") {
+			if (!module.radarLayers[ts]) {
 				module.radarLayers[ts] = new google.maps.ImageMapType({
 					getTileUrl: function (coord, zoom) {
 						return [
@@ -97,7 +97,9 @@ class Utils {
 					opacity: 0.0001,
 				});
 				module.map.overlayMapTypes.push(module.radarLayers[ts]);
-			} else {
+			}
+		} else {
+			if (!module.radarLayers[ts]) {
 				module.radarLayers[ts] = new L.TileLayer(
 					"https://tilecache.rainviewer.com/v2/radar/" +
 						ts +
@@ -109,13 +111,22 @@ class Utils {
 					}
 				);
 			}
+
+			if (!module.map.hasLayer(module.radarLayers[ts])) {
+				module.map.addLayer(module.radarLayers[ts]);
+			}
 		}
-		if (
-			module.config.map.toUpperCase() !== "GOOGLE" &&
-			!module.map.hasLayer(module.radarLayers[ts])
-		) {
-			module.map.addLayer(module.radarLayers[ts]);
+	}
+
+	static clearLayers(module) {
+		if (module.config.map.toUpperCase() === "GOOGLE") {
+			module.map.overlayMapTypes.clear();
+		} else {
+			module.timestamps.forEach((ts) => {
+				module.map.removeLayer(module.radarLayers[ts]);
+			});
 		}
+		module.radarLayers = [];
 	}
 
 	static showFrame(module, nextPosition) {

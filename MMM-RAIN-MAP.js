@@ -74,7 +74,6 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	updateData: function () {
-		console.log("Update Data");
 		if (this.config.onlyOnRain) {
 			const weaterIcons = document.querySelectorAll(
 				"div.currentweather span.wi.weathericon"
@@ -105,6 +104,7 @@ Module.register("MMM-RAIN-MAP", {
 		apiRequest.onload = function (e) {
 			// save available timestamps and show the latest frame: "-1" means "timestamp.lenght - 1"
 			self.stop();
+			Utils.clearLayers(self);
 			self.timestamps = JSON.parse(apiRequest.response);
 			Utils.showFrame(self, -1);
 			self.play(self);
@@ -121,20 +121,13 @@ Module.register("MMM-RAIN-MAP", {
 
 	play: function () {
 		Utils.showFrame(this, this.animationPosition + 1);
+		let zoomAfterPlay = false;
 		if (
 			this.config.zoomOutEach > 0 &&
 			this.animationPosition + 1 === this.timestamps.length
 		) {
 			if (this.config.zoomOutEach === this.loopNumber) {
-				if (this.map.getZoom() === this.config.zoom) {
-					this.map.setZoom(
-						this.map.getZoom() === this.config.zoom
-							? this.config.zoom - this.config.zoomOutLevel
-							: this.config.zoom
-					);
-				} else {
-					this.map.setZoom(this.config.zoom);
-				}
+				zoomAfterPlay = true;
 				this.loopNumber = 1;
 			} else {
 				this.loopNumber++;
@@ -146,6 +139,17 @@ Module.register("MMM-RAIN-MAP", {
 				? this.config.animationSpeed + this.config.extraDelayLastFrame
 				: this.config.animationSpeed;
 		this.animationTimer = setTimeout(function () {
+			if (zoomAfterPlay) {
+				if (self.map.getZoom() === self.config.zoom) {
+					self.map.setZoom(
+						self.map.getZoom() === self.config.zoom
+							? self.config.zoom - self.config.zoomOutLevel
+							: self.config.zoom
+					);
+				} else {
+					self.map.setZoom(self.config.zoom);
+				}
+			}
 			self.play();
 		}, timeOut);
 	},
