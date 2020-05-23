@@ -39,7 +39,6 @@ Module.register("MMM-RAIN-MAP", {
 	map: null,
 	radarLayers: [],
 	timestamps: [],
-	utils: null,
 
 	getStyles: () => {
 		return [
@@ -61,20 +60,20 @@ Module.register("MMM-RAIN-MAP", {
 
 	start: function () {
 		this.scheduleUpdate(this.updateInterval);
-		this.utils = new Utils(this);
 	},
 
 	getDom: function () {
 		if (this.config.map.toUpperCase() === "GOOGLE") {
-			this.utils.initGoogleMap();
+			Utils.initGoogleMap(this);
 		} else {
-			this.utils.initOSMap();
+			Utils.initOSMap(this);
 		}
 
-		return this.utils.initMapWrapper();
+		return Utils.initMapWrapper(this);
 	},
 
 	updateData: function () {
+		console.log("Update Data");
 		if (this.config.onlyOnRain) {
 			const weaterIcons = document.querySelectorAll(
 				"div.currentweather span.wi.weathericon"
@@ -104,11 +103,9 @@ Module.register("MMM-RAIN-MAP", {
 		apiRequest.open("GET", "https://api.rainviewer.com/public/maps.json", true);
 		apiRequest.onload = function (e) {
 			// save available timestamps and show the latest frame: "-1" means "timestamp.lenght - 1"
-			self.timestamps = JSON.parse(apiRequest.response);
-			self.arrayData = [];
-			self.radarLayers = [];
-			self.utils.showFrame(-1);
 			self.stop();
+			self.timestamps = JSON.parse(apiRequest.response);
+			Utils.showFrame(self, -1);
 			self.play(self);
 		};
 		apiRequest.send();
@@ -118,11 +115,11 @@ Module.register("MMM-RAIN-MAP", {
 		const self = this;
 		setInterval(function () {
 			self.updateData();
-		}, this.config.updateIntervalInSeconds * 1000);
+		}, self.config.updateIntervalInSeconds * 1000);
 	},
 
 	play: function (self) {
-		self.utils.showFrame(this.animationPosition + 1);
+		Utils.showFrame(this, this.animationPosition + 1);
 		if (self.config.zoomOutEach > 0) {
 			if (self.config.zoomOutEach === self.loopNumber) {
 				if (this.animationPosition + 1 === this.timestamps.length) {

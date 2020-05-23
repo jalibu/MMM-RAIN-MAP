@@ -1,16 +1,11 @@
 class Utils {
-	constructor(module) {
-		this.module = module;
-	}
-
-	initOSMap() {
+	static initOSMap(module) {
 		const script = document.createElement("script");
 		script.type = "text/javascript";
 		script.src = "https://unpkg.com/leaflet@1.6.0/dist/leaflet.js";
 		script.setAttribute("defer", "");
 		script.setAttribute("async", "");
 		document.body.appendChild(script);
-		const module = this.module;
 		script.onload = function () {
 			module.map = L.map("rain-map-map", { zoomControl: false }).setView(
 				[module.config.lat, module.config.lng],
@@ -28,14 +23,13 @@ class Utils {
 		};
 	}
 
-	initGoogleMap() {
+	static initGoogleMap(module) {
 		const script = document.createElement("script");
 		script.type = "text/javascript";
-		script.src = `https://maps.googleapis.com/maps/api/js?key=${this.module.config.key}`;
+		script.src = `https://maps.googleapis.com/maps/api/js?key=${module.config.key}`;
 		script.setAttribute("defer", "");
 		script.setAttribute("async", "");
 		document.body.appendChild(script);
-		const module = this.module;
 		script.onload = function () {
 			module.map = new google.maps.Map(
 				document.getElementById("rain-map-map"),
@@ -65,17 +59,17 @@ class Utils {
 		};
 	}
 
-	initMapWrapper() {
+	static initMapWrapper(module) {
 		const app = document.createElement("div");
-		app.style.height = this.module.config.height;
-		app.style.width = this.module.config.width;
+		app.style.height = module.config.height;
+		app.style.width = module.config.width;
 		app.style.position = "relative";
 		app.setAttribute("id", "rain-map-wrapper");
 
-		let markup = `<div id="rain-map-map" style="height: ${this.module.config.height}; width: ${this.module.config.width}"></div>`;
-		if (this.module.config.displayTime) {
+		let markup = `<div id="rain-map-map" style="height: ${module.config.height}; width: ${module.config.width}"></div>`;
+		if (module.config.displayTime) {
 			markup += `<div class="rain-map-time-wrapper">
-						${this.module.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ""}
+						${module.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ""}
 						<span id="rain-map-time"></span>
 					</div>`;
 		}
@@ -84,10 +78,10 @@ class Utils {
 		return app;
 	}
 
-	addLayer(ts) {
-		if (!this.module.radarLayers[ts]) {
-			if (this.module.config.map.toUpperCase() === "GOOGLE") {
-				this.module.radarLayers[ts] = new google.maps.ImageMapType({
+	static addLayer(module, ts) {
+		if (!module.radarLayers[ts]) {
+			if (module.config.map.toUpperCase() === "GOOGLE") {
+				module.radarLayers[ts] = new google.maps.ImageMapType({
 					getTileUrl: function (coord, zoom) {
 						return [
 							"https://tilecache.rainviewer.com/v2/radar/" + ts + "/256/",
@@ -102,9 +96,9 @@ class Utils {
 					tileSize: new google.maps.Size(256, 256),
 					opacity: 0.0001,
 				});
-				this.module.map.overlayMapTypes.push(this.module.radarLayers[ts]);
+				module.map.overlayMapTypes.push(module.radarLayers[ts]);
 			} else {
-				this.module.radarLayers[ts] = new L.TileLayer(
+				module.radarLayers[ts] = new L.TileLayer(
 					"https://tilecache.rainviewer.com/v2/radar/" +
 						ts +
 						"/256/{z}/{x}/{y}/2/1_1.png",
@@ -117,56 +111,52 @@ class Utils {
 			}
 		}
 		if (
-			this.module.config.map.toUpperCase() !== "GOOGLE" &&
-			!this.module.map.hasLayer(this.module.radarLayers[ts])
+			module.config.map.toUpperCase() !== "GOOGLE" &&
+			!module.map.hasLayer(module.radarLayers[ts])
 		) {
-			this.module.map.addLayer(this.module.radarLayers[ts]);
+			module.map.addLayer(module.radarLayers[ts]);
 		}
 	}
 
-	showFrame(nextPosition) {
+	static showFrame(module, nextPosition) {
 		const preloadingDirection =
 			nextPosition - this.animationPosition > 0 ? 1 : -1;
 
-		this.changeRadarPosition(nextPosition);
-		this.changeRadarPosition(nextPosition + preloadingDirection, true);
+		this.changeRadarPosition(module, nextPosition);
+		this.changeRadarPosition(module, nextPosition + preloadingDirection, true);
 	}
 
-	changeRadarPosition(position, preloadOnly) {
-		while (position >= this.module.timestamps.length) {
-			position -= this.module.timestamps.length;
+	static changeRadarPosition(module, position, preloadOnly) {
+		while (position >= module.timestamps.length) {
+			position -= module.timestamps.length;
 		}
 		while (position < 0) {
-			position += this.module.timestamps.length;
+			position += module.timestamps.length;
 		}
 
-		const currentTimestamp = this.module.timestamps[
-			this.module.animationPosition
-		];
-		const nextTimestamp = this.module.timestamps[position];
+		const currentTimestamp = module.timestamps[module.animationPosition];
+		const nextTimestamp = module.timestamps[position];
 
-		this.addLayer(nextTimestamp);
+		this.addLayer(module, nextTimestamp);
 
 		if (preloadOnly) {
 			return;
 		}
 
-		this.module.animationPosition = position;
+		module.animationPosition = position;
 
-		if (this.module.radarLayers[currentTimestamp]) {
-			this.module.radarLayers[currentTimestamp].setOpacity(0);
+		if (module.radarLayers[currentTimestamp]) {
+			module.radarLayers[currentTimestamp].setOpacity(0);
 		}
-		this.module.radarLayers[nextTimestamp].setOpacity(
-			this.module.config.opacity
-		);
+		module.radarLayers[nextTimestamp].setOpacity(module.config.opacity);
 
-		if (this.module.config.displayTime) {
+		if (module.config.displayTime) {
 			const time = moment(nextTimestamp * 1000);
-			if (this.module.config.timezone) {
-				time.tz(this.module.config.timezone);
+			if (module.config.timezone) {
+				time.tz(module.config.timezone);
 			}
 			let hourSymbol = "HH";
-			if (this.module.config.timeFormat !== 24) {
+			if (module.config.timeFormat !== 24) {
 				hourSymbol = "h";
 			}
 
