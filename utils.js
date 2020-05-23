@@ -12,7 +12,7 @@ class Utils {
 		document.body.appendChild(script);
 		const module = this.module;
 		script.onload = function () {
-			module.map = L.map("rain-map-map").setView(
+			module.map = L.map("rain-map-map", { zoomControl: false }).setView(
 				[module.config.lat, module.config.lng],
 				module.config.zoom
 			);
