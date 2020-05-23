@@ -31,37 +31,37 @@ class Utils {
 	initGoogleMap() {
 		const script = document.createElement("script");
 		script.type = "text/javascript";
-		script.src = `https://maps.googleapis.com/maps/api/js?key=${this.config.key}`;
+		script.src = `https://maps.googleapis.com/maps/api/js?key=${this.module.config.key}`;
 		script.setAttribute("defer", "");
 		script.setAttribute("async", "");
 		document.body.appendChild(script);
-
+		const module = this.module;
 		script.onload = function () {
-			this.module.map = new google.maps.Map(
+			module.map = new google.maps.Map(
 				document.getElementById("rain-map-map"),
 				{
-					zoom: this.config.zoom,
-					mapTypeId: this.config.mapTypeId,
+					zoom: module.config.zoom,
+					mapTypeId: module.config.mapTypeId,
 					center: {
-						lat: this.config.lat,
-						lng: this.config.lng,
+						lat: module.config.lat,
+						lng: module.config.lng,
 					},
-					disableDefaultUI: this.config.disableDefaultUI,
-					backgroundColor: this.config.backgroundColor,
+					disableDefaultUI: module.config.disableDefaultUI,
+					backgroundColor: module.config.backgroundColor,
 				}
 			);
 
-			this.module.config.markers.forEach((marker) => {
+			module.config.markers.forEach((marker) => {
 				new google.maps.Marker({
 					position: {
 						lat: marker.lat,
 						lng: marker.lng,
 					},
-					map: self.map,
+					map: module.map,
 				});
 			});
 
-			callback();
+			module.updateData();
 		};
 	}
 
@@ -82,5 +82,97 @@ class Utils {
 		app.innerHTML = markup;
 
 		return app;
+	}
+
+	addLayer(ts) {
+		if (!this.module.radarLayers[ts]) {
+			if (this.module.config.map.toUpperCase() === "GOOGLE") {
+				this.module.radarLayers[ts] = new google.maps.ImageMapType({
+					getTileUrl: function (coord, zoom) {
+						return [
+							"https://tilecache.rainviewer.com/v2/radar/" + ts + "/256/",
+							zoom,
+							"/",
+							coord.x,
+							"/",
+							coord.y,
+							"/2/1_1.png",
+						].join("");
+					},
+					tileSize: new google.maps.Size(256, 256),
+					opacity: 0.0001,
+				});
+				this.module.map.overlayMapTypes.push(this.module.radarLayers[ts]);
+			} else {
+				this.module.radarLayers[ts] = new L.TileLayer(
+					"https://tilecache.rainviewer.com/v2/radar/" +
+						ts +
+						"/256/{z}/{x}/{y}/2/1_1.png",
+					{
+						tileSize: 256,
+						opacity: 0.001,
+						zIndex: ts,
+					}
+				);
+			}
+		}
+		if (
+			this.module.config.map.toUpperCase() !== "GOOGLE" &&
+			!this.module.map.hasLayer(this.module.radarLayers[ts])
+		) {
+			this.module.map.addLayer(this.module.radarLayers[ts]);
+		}
+	}
+
+	showFrame(nextPosition) {
+		const preloadingDirection =
+			nextPosition - this.animationPosition > 0 ? 1 : -1;
+
+		this.changeRadarPosition(nextPosition);
+		this.changeRadarPosition(nextPosition + preloadingDirection, true);
+	}
+
+	changeRadarPosition(position, preloadOnly) {
+		while (position >= this.module.timestamps.length) {
+			position -= this.module.timestamps.length;
+		}
+		while (position < 0) {
+			position += this.module.timestamps.length;
+		}
+
+		const currentTimestamp = this.module.timestamps[
+			this.module.animationPosition
+		];
+		const nextTimestamp = this.module.timestamps[position];
+
+		this.addLayer(nextTimestamp);
+
+		if (preloadOnly) {
+			return;
+		}
+
+		this.module.animationPosition = position;
+
+		if (this.module.radarLayers[currentTimestamp]) {
+			this.module.radarLayers[currentTimestamp].setOpacity(0);
+		}
+		this.module.radarLayers[nextTimestamp].setOpacity(
+			this.module.config.opacity
+		);
+
+		if (this.module.config.displayTime) {
+			const time = moment(nextTimestamp * 1000);
+			if (this.module.config.timezone) {
+				time.tz(this.config.timezone);
+			}
+			let hourSymbol = "HH";
+			if (this.config.timeFormat !== 24) {
+				hourSymbol = "h";
+			}
+
+			document.getElementById("rain-map-time").innerHTML = `${time.format(
+				hourSymbol + ":mm"
+			)}`;
+		}
 	}
 }

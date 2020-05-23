@@ -8,7 +8,7 @@ Module.register("MMM-RAIN-MAP", {
 		backgroundColor: "rgba(0, 0, 0, 0)",
 		disableDefaultUI: true,
 		displayClockSymbol: true,
-		displayTime: false,
+		displayTime: true,
 		height: "420px",
 		iconsToShow: [
 			"wi-rain",
@@ -39,6 +39,7 @@ Module.register("MMM-RAIN-MAP", {
 	map: null,
 	radarLayers: [],
 	timestamps: [],
+	utils: null,
 
 	getStyles: () => {
 		return [
@@ -60,17 +61,17 @@ Module.register("MMM-RAIN-MAP", {
 
 	start: function () {
 		this.scheduleUpdate(this.updateInterval);
+		this.utils = new Utils(this);
 	},
 
 	getDom: function () {
-		const utils = new Utils(this);
-		if (this.config.map === "OSM") {
-			utils.initOSMap();
+		if (this.config.map.toUpperCase() === "GOOGLE") {
+			this.utils.initGoogleMap();
 		} else {
-			utils.initGoogleMap();
+			this.utils.initOSMap();
 		}
 
-		return utils.initMapWrapper();
+		return this.utils.initMapWrapper();
 	},
 
 	updateData: function () {
@@ -85,7 +86,7 @@ Module.register("MMM-RAIN-MAP", {
 					hasRainIcon = hasRainIcon || icon.classList.contains(iconName);
 				});
 				if (hasRainIcon) {
-					this.sendRequest();
+					this.getTimeStamps();
 					this.show();
 				} else {
 					this.hide();
@@ -93,11 +94,11 @@ Module.register("MMM-RAIN-MAP", {
 				}
 			}
 		} else {
-			this.sendRequest();
+			this.getTimeStamps();
 		}
 	},
 
-	sendRequest: function () {
+	getTimeStamps: function () {
 		const self = this;
 		const apiRequest = new XMLHttpRequest();
 		apiRequest.open("GET", "https://api.rainviewer.com/public/maps.json", true);
@@ -105,7 +106,8 @@ Module.register("MMM-RAIN-MAP", {
 			// save available timestamps and show the latest frame: "-1" means "timestamp.lenght - 1"
 			self.timestamps = JSON.parse(apiRequest.response);
 			self.arrayData = [];
-			self.showFrame(-1);
+			self.radarLayers = [];
+			self.utils.showFrame(-1);
 			self.stop();
 			self.play(self);
 		};
@@ -119,93 +121,8 @@ Module.register("MMM-RAIN-MAP", {
 		}, this.config.updateIntervalInSeconds * 1000);
 	},
 
-	showFrame: function (nextPosition) {
-		const preloadingDirection =
-			nextPosition - this.animationPosition > 0 ? 1 : -1;
-
-		this.changeRadarPosition(nextPosition);
-		this.changeRadarPosition(nextPosition + preloadingDirection, true);
-	},
-
-	changeRadarPosition: function (position, preloadOnly) {
-		while (position >= this.timestamps.length) {
-			position -= this.timestamps.length;
-		}
-		while (position < 0) {
-			position += this.timestamps.length;
-		}
-
-		const currentTimestamp = this.timestamps[this.animationPosition];
-		const nextTimestamp = this.timestamps[position];
-
-		this.addLayer(nextTimestamp);
-
-		if (preloadOnly) {
-			return;
-		}
-
-		this.animationPosition = position;
-
-		if (this.radarLayers[currentTimestamp]) {
-			this.radarLayers[currentTimestamp].setOpacity(0);
-		}
-		this.radarLayers[nextTimestamp].setOpacity(this.config.opacity);
-
-		if (this.config.displayTime) {
-			const time = moment(nextTimestamp * 1000);
-			if (this.config.timezone) {
-				time.tz(this.config.timezone);
-			}
-			let hourSymbol = "HH";
-			if (this.config.timeFormat !== 24) {
-				hourSymbol = "h";
-			}
-
-			document.getElementById("rain-map-time").innerHTML = `${time.format(
-				hourSymbol + ":mm"
-			)}`;
-		}
-	},
-
-	addLayer: function (ts) {
-		if (!this.radarLayers[ts]) {
-			if (this.config.map === "OSM") {
-				this.radarLayers[ts] = new L.TileLayer(
-					"https://tilecache.rainviewer.com/v2/radar/" +
-						ts +
-						"/256/{z}/{x}/{y}/2/1_1.png",
-					{
-						tileSize: 256,
-						opacity: 0.001,
-						zIndex: ts,
-					}
-				);
-			} else {
-				this.radarLayers[ts] = new google.maps.ImageMapType({
-					getTileUrl: function (coord, zoom) {
-						return [
-							"https://tilecache.rainviewer.com/v2/radar/" + ts + "/256/",
-							zoom,
-							"/",
-							coord.x,
-							"/",
-							coord.y,
-							"/2/1_1.png",
-						].join("");
-					},
-					tileSize: new google.maps.Size(256, 256),
-					opacity: 0.0001,
-				});
-				this.map.overlayMapTypes.push(this.radarLayers[ts]);
-			}
-		}
-		if (this.config.map === "OSM" && !this.map.hasLayer(this.radarLayers[ts])) {
-			this.map.addLayer(this.radarLayers[ts]);
-		}
-	},
-
 	play: function (self) {
-		self.showFrame(this.animationPosition + 1);
+		self.utils.showFrame(this.animationPosition + 1);
 		if (self.config.zoomOutEach > 0) {
 			if (self.config.zoomOutEach === self.loopNumber) {
 				if (this.animationPosition + 1 === this.timestamps.length) {
