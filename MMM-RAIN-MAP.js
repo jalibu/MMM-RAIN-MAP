@@ -21,6 +21,7 @@ Module.register("MMM-RAIN-MAP", {
 		key: "",
 		lat: 50,
 		lng: 8.27,
+		map: "OSM",
 		mapTypeId: "terrain",
 		markers: [],
 		onlyOnRain: false,
@@ -38,13 +39,17 @@ Module.register("MMM-RAIN-MAP", {
 	map: null,
 	radarLayers: [],
 	timestamps: [],
+	utils: null,
 
 	getStyles: () => {
-		return ["MMM-RAIN-MAP.css"];
+		return [
+			"MMM-RAIN-MAP.css",
+			"https://unpkg.com/leaflet@1.6.0/dist/leaflet.css",
+		];
 	},
 
-	getScripts: () => {
-		return ["moment.js", "moment-timezone.js"];
+	getScripts: function () {
+		return [this.file("utils.js"), "moment.js", "moment-timezone.js"];
 	},
 
 	getTranslations: () => {
@@ -56,58 +61,17 @@ Module.register("MMM-RAIN-MAP", {
 
 	start: function () {
 		this.scheduleUpdate(this.updateInterval);
+		this.utils = new Utils(this);
 	},
 
 	getDom: function () {
-		const script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = `https://maps.googleapis.com/maps/api/js?key=${this.config.key}`;
-		script.setAttribute("defer", "");
-		script.setAttribute("async", "");
-		document.body.appendChild(script);
-
-		const self = this;
-		script.onload = function () {
-			self.map = new google.maps.Map(document.getElementById("rain-map-map"), {
-				zoom: self.config.zoom,
-				mapTypeId: self.config.mapTypeId,
-				center: {
-					lat: self.config.lat,
-					lng: self.config.lng,
-				},
-				disableDefaultUI: self.config.disableDefaultUI,
-				backgroundColor: self.config.backgroundColor,
-			});
-
-			self.config.markers.forEach((marker) => {
-				new google.maps.Marker({
-					position: {
-						lat: marker.lat,
-						lng: marker.lng,
-					},
-					map: self.map,
-				});
-			});
-
-			self.updateData();
-		};
-
-		const app = document.createElement("div");
-		app.style.height = this.config.height;
-		app.style.width = this.config.width;
-		app.style.position = "relative";
-		app.setAttribute("id", "rain-map-wrapper");
-
-		let markup = `<div id="rain-map-map" style="height: ${this.config.height}; width: ${this.config.width}"></div>`;
-		if (this.config.displayTime) {
-			markup += `<div class="rain-map-time-wrapper">
-						${this.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ""}
-						<span id="rain-map-time"></span>
-					</div>`;
+		if (this.config.map.toUpperCase() === "GOOGLE") {
+			this.utils.initGoogleMap();
+		} else {
+			this.utils.initOSMap();
 		}
-		app.innerHTML = markup;
 
-		return app;
+		return this.utils.initMapWrapper();
 	},
 
 	updateData: function () {
@@ -122,7 +86,7 @@ Module.register("MMM-RAIN-MAP", {
 					hasRainIcon = hasRainIcon || icon.classList.contains(iconName);
 				});
 				if (hasRainIcon) {
-					this.sendRequest();
+					this.getTimeStamps();
 					this.show();
 				} else {
 					this.hide();
@@ -130,11 +94,11 @@ Module.register("MMM-RAIN-MAP", {
 				}
 			}
 		} else {
-			this.sendRequest();
+			this.getTimeStamps();
 		}
 	},
 
-	sendRequest: function () {
+	getTimeStamps: function () {
 		const self = this;
 		const apiRequest = new XMLHttpRequest();
 		apiRequest.open("GET", "https://api.rainviewer.com/public/maps.json", true);
@@ -142,7 +106,8 @@ Module.register("MMM-RAIN-MAP", {
 			// save available timestamps and show the latest frame: "-1" means "timestamp.lenght - 1"
 			self.timestamps = JSON.parse(apiRequest.response);
 			self.arrayData = [];
-			self.showFrame(-1);
+			self.radarLayers = [];
+			self.utils.showFrame(-1);
 			self.stop();
 			self.play(self);
 		};
@@ -156,77 +121,8 @@ Module.register("MMM-RAIN-MAP", {
 		}, this.config.updateIntervalInSeconds * 1000);
 	},
 
-	showFrame: function (nextPosition) {
-		const preloadingDirection =
-			nextPosition - this.animationPosition > 0 ? 1 : -1;
-
-		this.changeRadarPosition(nextPosition);
-		this.changeRadarPosition(nextPosition + preloadingDirection, true);
-	},
-
-	changeRadarPosition: function (position, preloadOnly) {
-		while (position >= this.timestamps.length) {
-			position -= this.timestamps.length;
-		}
-		while (position < 0) {
-			position += this.timestamps.length;
-		}
-
-		const currentTimestamp = this.timestamps[this.animationPosition];
-		const nextTimestamp = this.timestamps[position];
-
-		this.addLayer(nextTimestamp);
-
-		if (preloadOnly) {
-			return;
-		}
-
-		this.animationPosition = position;
-
-		if (this.radarLayers[currentTimestamp]) {
-			this.radarLayers[currentTimestamp].setOpacity(0);
-		}
-		this.radarLayers[nextTimestamp].setOpacity(this.config.opacity);
-
-		if (this.config.displayTime) {
-			const time = moment(nextTimestamp * 1000);
-			if (this.config.timezone) {
-				time.tz(this.config.timezone);
-			}
-			let hourSymbol = "HH";
-			if (this.config.timeFormat !== 24) {
-				hourSymbol = "h";
-			}
-
-			document.getElementById("rain-map-time").innerHTML = `${time.format(
-				hourSymbol + ":mm"
-			)}`;
-		}
-	},
-
-	addLayer: function (ts) {
-		if (!this.radarLayers[ts]) {
-			this.radarLayers[ts] = new google.maps.ImageMapType({
-				getTileUrl: function (coord, zoom) {
-					return [
-						"https://tilecache.rainviewer.com/v2/radar/" + ts + "/256/",
-						zoom,
-						"/",
-						coord.x,
-						"/",
-						coord.y,
-						"/2/1_1.png",
-					].join("");
-				},
-				tileSize: new google.maps.Size(256, 256),
-				opacity: 0.0001,
-			});
-			this.map.overlayMapTypes.push(this.radarLayers[ts]);
-		}
-	},
-
 	play: function (self) {
-		self.showFrame(this.animationPosition + 1);
+		self.utils.showFrame(this.animationPosition + 1);
 		if (self.config.zoomOutEach > 0) {
 			if (self.config.zoomOutEach === self.loopNumber) {
 				if (this.animationPosition + 1 === this.timestamps.length) {

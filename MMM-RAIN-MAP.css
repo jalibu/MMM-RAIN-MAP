@@ -12,3 +12,7 @@
 .rain-map-time-wrapper i {
 	margin-right: 6px;
 }
+li {
+	list-style: none;
+	display: inline-block;
+}
