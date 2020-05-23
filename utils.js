@@ -123,7 +123,12 @@ class Utils {
 			module.map.overlayMapTypes.clear();
 		} else {
 			module.timestamps.forEach((ts) => {
-				module.map.removeLayer(module.radarLayers[ts]);
+				if (
+					module.radarLayers[ts] &&
+					module.map.hasLayer(module.radarLayers[ts])
+				) {
+					module.map.removeLayer(module.radarLayers[ts]);
+				}
 			});
 		}
 		module.radarLayers = [];

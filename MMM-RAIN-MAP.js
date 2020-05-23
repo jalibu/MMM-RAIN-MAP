@@ -11,14 +11,7 @@ Module.register("MMM-RAIN-MAP", {
 		displayTime: true,
 		extraDelayLastFrame: 2000,
 		height: "420px",
-		iconsToShow: [
-			"wi-rain",
-			"wi-thunderstorm",
-			"wi-snow",
-			"wi-night-rain",
-			"wi-night-thunderstorm",
-			"wi-night-snow",
-		],
+		iconsToShow: ["09d", "09n", "10d", "10n", "11d", "11n", "13d", "13n"],
 		key: "",
 		lat: 50,
 		lng: 8.27,
@@ -40,6 +33,7 @@ Module.register("MMM-RAIN-MAP", {
 	map: null,
 	radarLayers: [],
 	timestamps: [],
+	isCurrentlyRaining: false,
 
 	getStyles: () => {
 		return [
@@ -75,22 +69,12 @@ Module.register("MMM-RAIN-MAP", {
 
 	updateData: function () {
 		if (this.config.onlyOnRain) {
-			const weaterIcons = document.querySelectorAll(
-				"div.currentweather span.wi.weathericon"
-			);
-			if (weaterIcons && weaterIcons.length === 1) {
-				const icon = weaterIcons[0];
-				let hasRainIcon = false;
-				this.config.iconsToShow.forEach((iconName) => {
-					hasRainIcon = hasRainIcon || icon.classList.contains(iconName);
-				});
-				if (hasRainIcon) {
-					this.getTimeStamps();
-					this.show();
-				} else {
-					this.hide();
-					this.stop();
-				}
+			if (this.isCurrentlyRaining) {
+				this.getTimeStamps();
+				this.show();
+			} else {
+				this.hide();
+				this.stop();
 			}
 		} else {
 			this.getTimeStamps();
@@ -110,6 +94,19 @@ Module.register("MMM-RAIN-MAP", {
 			self.play(self);
 		};
 		apiRequest.send();
+	},
+
+	notificationReceived: function (notification, payload, sender) {
+		if (notification === "CURRENTWEATHER_DATA") {
+			try {
+				this.isCurrentlyRaining = this.config.iconsToShow.includes(
+					payload.data.weather[0].icon
+				);
+				this.updateData();
+			} catch (err) {
+				console.warn("Could not extract weather data");
+			}
+		}
 	},
 
 	scheduleUpdate: function () {
