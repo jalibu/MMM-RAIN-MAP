@@ -121,18 +121,19 @@ Module.register("MMM-RAIN-MAP", {
 
 	play: function () {
 		Utils.showFrame(this, this.animationPosition + 1);
-		if (this.config.zoomOutEach > 0) {
+		if (
+			this.config.zoomOutEach > 0 &&
+			this.animationPosition + 1 === this.timestamps.length
+		) {
 			if (this.config.zoomOutEach === this.loopNumber) {
-				if (this.animationPosition + 1 === this.timestamps.length) {
-					if (this.map.getZoom() === this.config.zoom) {
-						this.map.setZoom(
-							this.map.getZoom() === this.config.zoom
-								? this.config.zoom - this.config.zoomOutLevel
-								: this.config.zoom
-						);
-					} else {
-						this.map.setZoom(this.config.zoom);
-					}
+				if (this.map.getZoom() === this.config.zoom) {
+					this.map.setZoom(
+						this.map.getZoom() === this.config.zoom
+							? this.config.zoom - this.config.zoomOutLevel
+							: this.config.zoom
+					);
+				} else {
+					this.map.setZoom(this.config.zoom);
 				}
 				this.loopNumber = 1;
 			} else {

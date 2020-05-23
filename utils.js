@@ -7,10 +7,10 @@ class Utils {
 		script.setAttribute("async", "");
 		document.body.appendChild(script);
 		script.onload = function () {
-			module.map = L.map("rain-map-map", { zoomControl: false }).setView(
-				[module.config.lat, module.config.lng],
-				module.config.zoom
-			);
+			module.map = L.map("rain-map-map", {
+				zoomControl: false,
+				attributionControl: false,
+			}).setView([module.config.lat, module.config.lng], module.config.zoom);
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
 				module.map
 			);
