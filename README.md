@@ -39,7 +39,7 @@ To use this module, add it to the modules array in the `config/config.js` file:
 		lat: 50,
 		lng: 8.27,
 		mapTypeId: "terrain",
-		markers: [{ lat: 50, lng: 8.27 }],
+		markers: [{ lat: 50, lng: 8.27, color: "red" }],
 		onlyOnRain: true,
 		opacity: 0.75,
 		showClockSymbol: false,
@@ -64,7 +64,7 @@ To use this module, add it to the modules array in the `config/config.js` file:
 | `zoom`                    | Zoom value to display from lat/lng. <br><br>**Type:** `integer` <br> **Default value:** `8`                                                                                                                 |
 | `mapTypeId`               | [Google Maps Only] The map type to display (roadmap, satellite, hybrid, terrain). <br><br>**Type:** `string` <br> **Default value:** `terrain`                                                              |  |
 | `disableDefaultUI`        | [Google Maps Only] Disable default UI buttons (Zoom and Street View). <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                            |
-| `markers`                 | Additional markers in the map as an array. See example.                                                                                                                                                     |
+| `markers`                 | Additional markers in the map as an array. See example.  Note: The color property only works with OpenStreetMap.                                                                                            |
 | `backgroundColor`         | [Google Maps Only] Backgound behind the map.Can be set to transparent (`'hsla(0, 0%, 0%, 0)'`) or left at black (default). <br><br>**Type:** `string` <br> **Default value:** `'rgba(0, 0, 0, 0)'`          |
 | `updateIntervalInSeconds` | Update interval for fetching new radar frames in seconds. (New frames are released every 10 minutes) <br><br>**Type:** `int` <br> **Default value:** `300`                                                  |
 | `animationSpeed`          | Determines how fast the frames are played (time per frame in milliseconds). <br><br>**Type:** `int` <br> **Default value:** `600`                                                                           |

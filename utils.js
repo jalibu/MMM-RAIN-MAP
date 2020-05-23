@@ -1,5 +1,16 @@
 class Utils {
 	static initOSMap(module) {
+		const supportedIconColors = [
+			"black",
+			"blue",
+			"gold",
+			"green",
+			"grey",
+			"orange",
+			"red",
+			"violet",
+			"yellow",
+		];
 		const script = document.createElement("script");
 		script.type = "text/javascript";
 		script.src = "https://unpkg.com/leaflet@1.6.0/dist/leaflet.js";
@@ -14,9 +25,22 @@ class Utils {
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
 				module.map
 			);
-
 			module.config.markers.forEach((marker) => {
-				L.marker([marker.lat, marker.lng]).addTo(module.map);
+				const color =
+					marker.color && supportedIconColors.includes(marker.color)
+						? marker.color
+						: "red";
+				L.marker([marker.lat, marker.lng], {
+					icon: new L.Icon({
+						iconUrl: `https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+						shadowUrl:
+							"https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+						iconSize: [25, 41],
+						iconAnchor: [12, 41],
+						popupAnchor: [1, -34],
+						shadowSize: [41, 41],
+					}),
+				}).addTo(module.map);
 			});
 
 			module.updateData();
