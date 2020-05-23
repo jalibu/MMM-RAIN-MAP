@@ -163,10 +163,10 @@ class Utils {
 		if (this.module.config.displayTime) {
 			const time = moment(nextTimestamp * 1000);
 			if (this.module.config.timezone) {
-				time.tz(this.config.timezone);
+				time.tz(this.module.config.timezone);
 			}
 			let hourSymbol = "HH";
-			if (this.config.timeFormat !== 24) {
+			if (this.module.config.timeFormat !== 24) {
 				hourSymbol = "h";
 			}
 
