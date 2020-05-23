@@ -6,7 +6,7 @@ Click here for the Magic Mirror [Forum Thread](https://forum.magicmirror.builder
 
 ## Features
 
-- Shows Rainviewer.com rain data on Google Maps.
+- Shows Rainviewer.com rain data on OpenStreet Map or Google Maps.
 - Option to support multiple, alternating zoom levels
 - Option to only show on rain (dependency to currentweather module)
 - Option to add markers on map
@@ -34,6 +34,7 @@ To use this module, add it to the modules array in the `config/config.js` file:
 		animationSpeed: 600,
 		height: "420px",
 		width: "420px",
+		map: "GOOGLE",
 		key: "<INSERT_HERE>",
 		lat: 50,
 		lng: 8.27,
