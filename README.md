@@ -3,13 +3,15 @@
 A Rain Radar Map for [Magic Mirror](https://magicmirror.builders/) based on the [Rainviewer API](https://github.com/rainviewer/rainviewer-api-example).  
 Click here for the [Forum Thread](https://forum.magicmirror.builders/topic/12808/mmm-rain-map).
 
-
 ## Features
 
 - Shows Rainviewer.com rain data on OpenStreetMap or Google Maps
 - Option to support multiple, alternating zoom levels
 - Option to only show on rain (dependency to currentweather module)
 - Option to add markers on map
+- OpenStreetMap vs. Google Maps  
+  ![](docs/OSM_ScreenCast.gif) ![](docs/Google_ScreenCast.gif) 
+  
 
 ## Installing the Module
 
