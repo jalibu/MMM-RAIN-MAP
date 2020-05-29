@@ -4,32 +4,34 @@
 
 Module.register("MMM-RAIN-MAP", {
 	defaults: {
-		animationSpeed: 600,
-		backgroundColor: "rgba(0, 0, 0, 0)",
-		disableDefaultUI: true,
+		animationSpeedMs: 600,
+		defaultZoomLevel: 5,
 		displayClockSymbol: true,
+		displayOnRainOnly: false,
 		displayTime: true,
-		extraDelayLastFrame: 2000,
-		height: "420px",
-		iconsToShow: ["09d", "09n", "10d", "10n", "11d", "11n", "13d", "13n"],
-		key: "",
-		lat: 50,
-		lng: 8.27,
+		extraDelayLastFrameMs: 2000,
+		googleBackgroundColor: "rgba(0, 0, 0, 0)",
+		googleDisableDefaultUI: true,
+		googleKey: "",
+		googleMapTypeId: "terrain",
 		map: "OSM",
-		mapTypeId: "terrain",
-		markers: [],
-		onlyOnRain: false,
-		opacity: 0.65,
+		mapHeight: "420px",
+		mapWidth: "420px",
+		markers: [
+			{ lat: 50, lng: 9.27, zoom: 8, color: "red", hidden: false },
+			{ lat: 51, lng: 8.27, zoom: 5, color: "blue", hidden: false },
+			{ lat: 21, lng: 18.27, zoom: 3, color: "green", hidden: false },
+		],
+		markerChangeInterval: 1,
+		rainIcons: ["09d", "09n", "10d", "10n", "11d", "11n", "13d", "13n"],
+		overlayOpacity: 0.65,
 		timeFormat: config.timeFormat || 24,
-		updateIntervalInSeconds: 300,
-		width: "420px",
-		zoom: 8,
-		zoomOutEach: 0,
-		zoomOutLevel: 2,
+		updateIntervalMs: 300000,
 	},
 	animationPosition: 0,
 	animationTimer: false,
 	loopNumber: 1,
+	markerPosition: 0,
 	map: null,
 	radarLayers: [],
 	timestamps: [],
@@ -54,7 +56,7 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	start: function () {
-		this.scheduleUpdate(this.updateInterval);
+		this.scheduleUpdate(this.updateIntervalMs);
 	},
 
 	getDom: function () {
@@ -68,7 +70,7 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	updateData: function () {
-		if (this.config.onlyOnRain) {
+		if (this.config.displayOnRainOnly) {
 			if (this.isCurrentlyRaining) {
 				this.getTimeStamps();
 				this.show();
@@ -99,7 +101,7 @@ Module.register("MMM-RAIN-MAP", {
 	notificationReceived: function (notification, payload, sender) {
 		if (notification === "CURRENTWEATHER_DATA") {
 			try {
-				this.isCurrentlyRaining = this.config.iconsToShow.includes(
+				this.isCurrentlyRaining = this.config.rainIcons.includes(
 					payload.data.weather[0].icon
 				);
 				this.updateData();
@@ -113,17 +115,18 @@ Module.register("MMM-RAIN-MAP", {
 		const self = this;
 		setInterval(function () {
 			self.updateData();
-		}, self.config.updateIntervalInSeconds * 1000);
+		}, self.config.updateIntervalMs);
 	},
 
 	play: function () {
 		Utils.showFrame(this, this.animationPosition + 1);
 		let zoomAfterPlay = false;
 		if (
-			this.config.zoomOutEach > 0 &&
+			this.config.markerChangeInterval > 0 &&
+			this.config.markers.length > 1 &&
 			this.animationPosition + 1 === this.timestamps.length
 		) {
-			if (this.config.zoomOutEach === this.loopNumber) {
+			if (this.config.markerChangeInterval === this.loopNumber) {
 				zoomAfterPlay = true;
 				this.loopNumber = 1;
 			} else {
@@ -133,18 +136,27 @@ Module.register("MMM-RAIN-MAP", {
 		const self = this;
 		const timeOut =
 			this.animationPosition + 1 === this.timestamps.length
-				? this.config.animationSpeed + this.config.extraDelayLastFrame
-				: this.config.animationSpeed;
+				? this.config.animationSpeedMs + this.config.extraDelayLastFrameMs
+				: this.config.animationSpeedMs;
 		this.animationTimer = setTimeout(function () {
 			if (zoomAfterPlay) {
-				if (self.map.getZoom() === self.config.zoom) {
-					self.map.setZoom(
-						self.map.getZoom() === self.config.zoom
-							? self.config.zoom - self.config.zoomOutLevel
-							: self.config.zoom
-					);
+				self.markerPosition =
+					self.markerPosition < self.config.markers.length - 1
+						? self.markerPosition + 1
+						: 0;
+				const marker = self.config.markers[self.markerPosition];
+				console.log("Position:", self.markerPosition, "Marker", marker);
+				if (self.config.map.toUpperCase() === "GOOGLE") {
+					self.map.setCenter(marker.lat, marker.lng);
+					self.map.setZoom(marker.zoom || self.config.defaultZoomLevel);
 				} else {
-					self.map.setZoom(self.config.zoom);
+					self.map.setView(
+						new L.LatLng(marker.lat, marker.lng),
+						marker.zoom || self.config.defaultZoomLevel,
+						{
+							animation: true,
+						}
+					);
 				}
 			}
 			self.play();

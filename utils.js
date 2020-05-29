@@ -18,10 +18,14 @@ class Utils {
 		script.setAttribute("async", "");
 		document.body.appendChild(script);
 		script.onload = function () {
+			const initialMarker = module.config.markers[0];
 			module.map = L.map("rain-map-map", {
 				zoomControl: false,
 				attributionControl: false,
-			}).setView([module.config.lat, module.config.lng], module.config.zoom);
+			}).setView(
+				[initialMarker.lat, initialMarker.lng],
+				initialMarker.zoom || module.config.defaultZoomLevel
+			);
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
 				module.map
 			);
@@ -50,22 +54,23 @@ class Utils {
 	static initGoogleMap(module) {
 		const script = document.createElement("script");
 		script.type = "text/javascript";
-		script.src = `https://maps.googleapis.com/maps/api/js?key=${module.config.key}`;
+		script.src = `https://maps.googleapis.com/maps/api/js?key=${module.config.googleKey}`;
 		script.setAttribute("defer", "");
 		script.setAttribute("async", "");
 		document.body.appendChild(script);
 		script.onload = function () {
+			const initialMarker = module.config.markers[0];
 			module.map = new google.maps.Map(
 				document.getElementById("rain-map-map"),
 				{
-					zoom: module.config.zoom,
-					mapTypeId: module.config.mapTypeId,
+					zoom: initialMarker.zoom || module.config.defaultZoomLevel,
+					mapTypeId: module.config.googleMapTypeId,
 					center: {
-						lat: module.config.lat,
-						lng: module.config.lng,
+						lat: initialMarker.lat,
+						lng: initialMarker.lng,
 					},
-					disableDefaultUI: module.config.disableDefaultUI,
-					backgroundColor: module.config.backgroundColor,
+					disableDefaultUI: module.config.googleDisableDefaultUI,
+					backgroundColor: module.config.googleBackgroundColor,
 				}
 			);
 
@@ -90,7 +95,7 @@ class Utils {
 		app.style.position = "relative";
 		app.setAttribute("id", "rain-map-wrapper");
 
-		let markup = `<div id="rain-map-map" style="height: ${module.config.height}; width: ${module.config.width}"></div>`;
+		let markup = `<div id="rain-map-map" style="height: ${module.config.mapHeight}; width: ${module.config.mapWidth}"></div>`;
 		if (module.config.displayTime) {
 			markup += `<div class="rain-map-time-wrapper">
 						${module.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ""}
@@ -188,7 +193,7 @@ class Utils {
 		if (module.radarLayers[currentTimestamp]) {
 			module.radarLayers[currentTimestamp].setOpacity(0);
 		}
-		module.radarLayers[nextTimestamp].setOpacity(module.config.opacity);
+		module.radarLayers[nextTimestamp].setOpacity(module.config.overlayOpacity);
 
 		if (module.config.displayTime) {
 			const time = moment(nextTimestamp * 1000);
