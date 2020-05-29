@@ -29,26 +29,23 @@ git clone https://github.com/jalibu/MMM-RAIN-MAP.git
 	module: "MMM-RAIN-MAP",
 	position: "top_left",
 	config: {
-		animationSpeed: 600,
+		animationSpeedMs: 600,
+		defaultZoomLevel: 5,
 		displayClockSymbol: true,
+		displayOnRainOnly: false,
 		displayTime: true,
-		extraDelayLastFrame: 2000,
-		height: "420px",
-		lat: 50,
-		lng: 8.27,
+		extraDelayLastFrameMs: 2000,
 		map: "OSM",
+		mapHeight: "420px",
+		mapWidth: "420px",
 		markers: [
-			{ lat: 50, lng: 8.27, color: "red" },
-		    { lat: 49.411, lng: 8.715, color: "blue" }
+			{ lat: 50, lng: 8.27, hidden: false, zoom: 5, color: "red", },
+			{ lat: 50, lng: 8.27, hidden: true, zoom: 8}
 		],
-		onlyOnRain: false,
-		opacity: 0.65,
+		markerChangeInterval: 3,
+		overlayOpacity: 0.65,
 		timeFormat: 24,
-		updateIntervalInSeconds: 300,
-		width: "420px",
-		zoom: 8,
-		zoomOutEach: 0,
-		zoomOutLevel: 2,
+		updateIntervalMs: 300000,
 	}
 }
 ```
@@ -60,29 +57,27 @@ git clone https://github.com/jalibu/MMM-RAIN-MAP.git
 	module: "MMM-RAIN-MAP",
 	position: "top_left",
 	config: {
-		animationSpeed: 600,
-		backgroundColor: "rgba(0, 0, 0, 0)",
+		animationSpeedMs: 600,
+		defaultZoomLevel: 5,
 		displayClockSymbol: true,
+		displayOnRainOnly: false,
 		displayTime: true,
-		extraDelayLastFrame: 2000,
-		height: "420px",
-		key: "<INSERT_HERE>",
-		lat: 50,
-		lng: 8.27,
+		extraDelayLastFrameMs: 2000,
+		googleBackgroundColor: "rgba(0, 0, 0, 0)",
+		googleDisableDefaultUI: true,
+		googleKey: "<INSERT_HERE>",
+		googleMapTypeId: "terrain",
 		map: "GOOGLE",
-		mapTypeId: "terrain",
+		mapHeight: "420px",
+		mapWidth: "420px",
 		markers: [
-			{ lat: 50, lng: 8.27 },
-		    { lat: 49.411, lng: 8.715 }
+			{ lat: 50, lng: 8.27, hidden: false, zoom: 5},
+			{ lat: 50, lng: 8.27, hidden: true, zoom: 8}
 		],
-				onlyOnRain: false,
-		opacity: 0.65,
+		markerChangeInterval: 3,
+		overlayOpacity: 0.65,
 		timeFormat: 24,
-		updateIntervalInSeconds: 300,
-		width: "420px",
-		zoom: 8,
-		zoomOutEach: 0,
-		zoomOutLevel: 2,
+		updateIntervalMs: 300000,
 	}
 }
 ```
@@ -91,34 +86,41 @@ git clone https://github.com/jalibu/MMM-RAIN-MAP.git
 
 ### General options
 
-| Option                    | Description                                                                                                                                                                                                                                                                                                                                  |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `map`                     | Used Map API <br>Possible values: `'GOOGLE'` or `'OSM'` <br><br>**Type:** `string` <br> **Default value:** `'OSM'`                                                                                                                                                                                                                           |
-| `lat`                     | **Required:** Latitude used to center the map.<br><br>**Type:** `float`                                                                                                                                                                                                                                                                      |
-| `lng`                     | **Required:** Longitude used to center the map.<br><br>**Type:** `float`                                                                                                                                                                                                                                                                     |
-| `height`                  | Height of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                                                                                                                                                     |
-| `width`                   | Width of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                                                                                                                                                      |
-| `zoom`                    | Map zoom value. <br><br>**Type:** `integer` <br> **Default value:** `8`                                                                                                                                                                                                                                                                      |
-| `markers`                 | Set markers in the map.<br> Example: `markers:[{lat:50, lng:8.27, color:"red"},{lat:49.411, lng:8.715, color:"blue"}]`<br>Possible colors: `'black','blue','gold','green','grey','orange','red','violet','yellow'`<br> Note: The color property only works with OpenStreetMap.<br><br>**Type:** `array[Object]` <br> **Default value:** `[]` |
-| `updateIntervalInSeconds` | Update interval for fetching new radar frames. (New frames are released every 10 minutes) <br><br>**Type:** `int` <br> **Default value:** `300` (time in seconds)                                                                                                                                                                            |
-| `animationSpeed`          | Determines how fast the frames are played. <br><br>**Type:** `int` <br> **Default value:** `600` (time per frame in milliseconds)                                                                                                                                                                                                            |
-| `extraDelayLastFrame`     | Add an extra delay to pause the animation on the latest frame.<br><br>**Type:** `int` <br> **Default value:** `2000` (time in milliseconds)                                                                                                                                                                                                  |
-| `opacity`                 | Opacity of radar overlay on map. <br><br>**Type:** `float` <br> **Default value:** `0.6`                                                                                                                                                                                                                                                     |
-| `onlyOnRain`              | If set to true, the map is only displayed when `currentweather module` shows rain or snow icon. <br><br>**Type:** `boolean` <br> **Default value:** `false`                                                                                                                                                                                  |
-| `displayTime`             | Display the time for each frame. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                                                                                                                                                  |
-| `timeFormat`              | Option to override the Magic Mirror's global the time format to 12 or 24 for this module. <br><br>**Type:** `int` <br> **Default value:** `[Global Config]` or `24`                                                                                                                                                                          |
-| `displayClockSymbol`      | Display clock symbol as time prefix. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                                                                                                                                              |
-| `zoomOutEach`             | If set to a number higher than 0, the map zooms out after n rotations of frames. It zooms back to default zoom level after the same number of rotations.<br><br>**Type:** `int` <br> **Default value:** `0` (disabled)                                                                                                                       |
-| `zoomOutLevel`            | If zoomOutEach is higher 0, this setting determines how far the map zooms out.<br><br>**Type:** `int` <br> **Default value:** `3`                                                                                                                                                                                                            |
+| Option                  | Description                                                                                                                                                                                                |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `animationSpeed`        | Determines how fast the frames are played. <br><br>**Type:** `int` <br> **Default value:** `600` (time per frame in milliseconds)                                                                          |
+| `defaultZoomLevel`      | Map zoom value. <br><br>**Type:** `integer` <br> **Default value:** `8`                                                                                                                                    |
+| `displayTime`           | Display the time for each frame. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                |
+| `displayClockSymbol`    | Display clock symbol as time prefix. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                            |
+| `displayOnRainOnly`     | If set to true, the map is only displayed when `currentweather module` shows rain or snow icon. <br><br>**Type:** `boolean` <br> **Default value:** `false`                                                |
+| `extraDelayLastFrameMs` | Add an extra delay to pause the animation on the latest frame.<br><br>**Type:** `int` <br> **Default value:** `2000` (time in milliseconds)                                                                |
+| `map`                   | Used Map API <br>Possible values: `'GOOGLE'` or `'OSM'` <br><br>**Type:** `string` <br> **Default value:** `'OSM'`                                                                                         |
+| `mapHeight`             | Height of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                   |
+| `mapWidth`              | Width of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                    |
+| `markers`               | **Required:** Array of markers or center-points in the map.<br> See examples and Markers-Object documentation below for details. <br><br>**Type:** `array[Markers]` <br> **Default value:** `[]`           |
+| `markerChangeInterval`  | If you have more than one marker and set this to a value higher than 0, the map jumps from marker to marker after the given number of intervals. <br><br>**Type:** `int` <br> **Default value:** `0` (off) |
+| `overlayOpacity`        | Opacity of radar overlay on map. <br><br>**Type:** `float` <br> **Default value:** `0.6`                                                                                                                   |
+| `timeFormat`            | Option to override the Magic Mirror's global the time format to 12 or 24 for this module. <br><br>**Type:** `int` <br> **Default value:** `[Global Config]` or `24`                                        |
+| `updateIntervalMs`      | Update interval for fetching new radar frames. (New frames are released every 10 minutes) <br><br>**Type:** `int` <br> **Default value:** `300000` (time in milliseconds)                                  |
+
+### Markers Object
+
+| Option   | Description                                                                                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `lat`    | **Required:** Markers latitude.<br><br>**Type:** `float`                                                                                                                       |
+| `lng`    | **Required:** Markers longitude.<br><br>**Type:** `float`                                                                                                                      |
+| `zoom`   | Set individual zoom level for marker-jumping mode.<br><br>**Type:** `int`                                                                                                      |
+| `color`  | Possible colors: `'black','blue','gold','green','grey','orange','red','violet','yellow'`<br> Note: The color property only works with OpenStreetMap.<br><br>**Type:** `string` |
+| `hidden` | Hide this marker on map (i.e. if it should just be a jump-point.<br><br>**Type:** `boolean`                                                                                    |
 
 ### Google Maps only options
 
-| Option             | Description                                                                                                                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `key`              | API key for Google Maps. Get a key at [Google Developer's page](https://developers.google.com/maps/documentation/javascript/).<br><br>**Type:** `string` <br> **Default value:** `''` |
-| `backgroundColor`  | Backgound behind the map. <br>Can be set to transparent (`'hsla(0, 0%, 0%, 0)'`) or left at black (default). <br><br>**Type:** `string` <br> **Default value:** `'rgba(0, 0, 0, 0)'`  |
-| `disableDefaultUI` | Disable default UI buttons (Zoom and Street View). <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                         |
-| `mapTypeId`        | The map type to display.<br>Possible values: `'roadmap', 'satellite', 'hybrid', 'terrain'`. <br><br>**Type:** `string` <br> **Default value:** `'terrain'`                            |
+| Option                   | Description                                                                                                                                                                                        |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `googleKey`              | **Required** API key for Google Maps. Get a key at [Google Developer's page](https://developers.google.com/maps/documentation/javascript/).<br><br>**Type:** `string` <br> **Default value:** `''` |
+| `googleBackgroundColor`  | Backgound behind the map. <br>Can be set to transparent (`'hsla(0, 0%, 0%, 0)'`) or left at black (default). <br><br>**Type:** `string` <br> **Default value:** `'rgba(0, 0, 0, 0)'`               |
+| `googleDisableDefaultUI` | Disable default UI buttons (Zoom and Street View). <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                      |
+| `googleMapTypeId`        | The map type to display.<br>Possible values: `'roadmap', 'satellite', 'hybrid', 'terrain'`. <br><br>**Type:** `string` <br> **Default value:** `'terrain'`                                         |
 
 ## Thanks to
 
