@@ -30,21 +30,23 @@ class Utils {
 				module.map
 			);
 			module.config.markers.forEach((marker) => {
-				const color =
-					marker.color && supportedIconColors.includes(marker.color)
-						? marker.color
-						: "red";
-				L.marker([marker.lat, marker.lng], {
-					icon: new L.Icon({
-						iconUrl: `https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-						shadowUrl:
-							"https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-						iconSize: [25, 41],
-						iconAnchor: [12, 41],
-						popupAnchor: [1, -34],
-						shadowSize: [41, 41],
-					}),
-				}).addTo(module.map);
+				if (!marker.hidden) {
+					const color =
+						marker.color && supportedIconColors.includes(marker.color)
+							? marker.color
+							: "red";
+					L.marker([marker.lat, marker.lng], {
+						icon: new L.Icon({
+							iconUrl: `https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+							shadowUrl:
+								"https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+							iconSize: [25, 41],
+							iconAnchor: [12, 41],
+							popupAnchor: [1, -34],
+							shadowSize: [41, 41],
+						}),
+					}).addTo(module.map);
+				}
 			});
 
 			module.updateData();
