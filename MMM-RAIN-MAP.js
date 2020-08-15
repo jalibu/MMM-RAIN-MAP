@@ -20,6 +20,7 @@ Module.register("MMM-RAIN-MAP", {
 		markers: [],
 		onlyOnRain: false,
 		opacity: 0.65,
+		osmmapurl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 		timeFormat: config.timeFormat || 24,
 		updateIntervalInSeconds: 300,
 		width: "420px",

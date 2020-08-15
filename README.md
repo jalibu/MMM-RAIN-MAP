@@ -120,6 +120,12 @@ git clone https://github.com/jalibu/MMM-RAIN-MAP.git
 | `disableDefaultUI` | Disable default UI buttons (Zoom and Street View). <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                         |
 | `mapTypeId`        | The map type to display.<br>Possible values: `'roadmap', 'satellite', 'hybrid', 'terrain'`. <br><br>**Type:** `string` <br> **Default value:** `'terrain'`                            |
 
+### OSM Maps only options
+
+| Option             | Description                                                                                                                                                                           |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `osmmapurl`        | Url of the used map. You can find alternative maps [here](https://wiki.openstreetmap.org/wiki/Tile_servers) in the column `tiles url`. <br> Before inserting the url into `config.js`you must delete the `$` signs before the {x},{y},{z}. <br>E.g.instead of using `https://tiles.wmflabs.org/bw-mapnik/${z}/${x}/${y}.png` <br> it has to be changed to `https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png` |
+
 ## Thanks to
 
 - All testers for their feedback
