@@ -22,7 +22,7 @@ class Utils {
 				zoomControl: false,
 				attributionControl: false,
 			}).setView([module.config.lat, module.config.lng], module.config.zoom);
-			L.tileLayer(module.config.osmmapurl).addTo(
+			L.tileLayer(module.config.osmMapUrl.split('$').join('')).addTo(
 				module.map
 			);
 			module.config.markers.forEach((marker) => {
