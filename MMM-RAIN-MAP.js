@@ -21,6 +21,7 @@ Module.register("MMM-RAIN-MAP", {
 		markerChangeInterval: 0,
 		rainIcons: ["09d", "09n", "10d", "10n", "11d", "11n", "13d", "13n"],
 		overlayOpacity: 0.65,
+		osmMapUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 		timeFormat: config.timeFormat || 24,
 		updateIntervalMs: 300000,
 	},

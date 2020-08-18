@@ -122,6 +122,12 @@ git clone https://github.com/jalibu/MMM-RAIN-MAP.git
 | `googleDisableDefaultUI` | Disable default UI buttons (Zoom and Street View). <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                      |
 | `googleMapTypeId`        | The map type to display.<br>Possible values: `'roadmap', 'satellite', 'hybrid', 'terrain'`. <br><br>**Type:** `string` <br> **Default value:** `'terrain'`                                         |
 
+### OSM Maps only options
+
+| Option             | Description                                                                                                                                                                           |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `osmMapUrl`        | Url of the used map. You can find alternative maps [here](https://wiki.openstreetmap.org/wiki/Tile_servers) in the column `tiles url`,<br>e.g. `https://tiles.wmflabs.org/bw-mapnik/${z}/${x}/${y}.png` for an uncolored map. |
+
 ## Thanks to
 
 - All testers for their feedback

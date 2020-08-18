@@ -26,7 +26,7 @@ class Utils {
 				[initialMarker.lat, initialMarker.lng],
 				initialMarker.zoom || module.config.defaultZoomLevel
 			);
-			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+			L.tileLayer(module.config.osmMapUrl.split("$").join("")).addTo(
 				module.map
 			);
 			module.config.markers.forEach((marker) => {
