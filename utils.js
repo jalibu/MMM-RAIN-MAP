@@ -144,7 +144,7 @@ class Utils {
 
 	static clearLayers(module) {
 		if (module.config.map.toUpperCase() === "GOOGLE") {
-			module.map.overlayMapTypes.clear();
+			module.map.overlayMapTypes.pop();
 		} else {
 			module.timestamps.forEach((ts) => {
 				if (
