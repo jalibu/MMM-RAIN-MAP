@@ -143,18 +143,7 @@ class Utils {
 	}
 
 	static clearLayers(module) {
-		if (module.config.map.toUpperCase() === "GOOGLE") {
-			module.map.overlayMapTypes.clear();
-		} else {
-			module.timestamps.forEach((ts) => {
-				if (
-					module.radarLayers[ts] &&
-					module.map.hasLayer(module.radarLayers[ts])
-				) {
-					module.map.removeLayer(module.radarLayers[ts]);
-				}
-			});
-		}
+
 		module.radarLayers = [];
 	}
 
