@@ -5,8 +5,9 @@ Click here for the [Forum Thread](https://forum.magicmirror.builders/topic/12808
 
 ## Features
 
-- Shows Rainviewer.com rain data on OpenStreetMap
-- Option to support multiple, alternating markers and zoom levels
+- Displays Rainviewer.com radar layers on OpenStreetMap
+- Option to support multiple, alternating markers and zoom levels  
+- **Important note:** The underlaying RainViewer.com free plan only supports history data. This is **no forecast**!  
 ![](docs/OSM_ScreenCast.gif)
 
 ## Installing the Module
