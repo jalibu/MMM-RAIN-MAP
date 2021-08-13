@@ -13,6 +13,8 @@ If you like this module and want to thank, please buy me a beer.
 - Displays Rainviewer.com radar layers on OpenStreetMap
 - Option to support multiple, alternating markers and zoom levels  
 - **Important note:** The underlaying RainViewer.com free plan only supports history data. This is **no forecast**!  
+
+### Screenshot
 ![](docs/OSM_ScreenCast.gif)
 
 ## Installing the Module
