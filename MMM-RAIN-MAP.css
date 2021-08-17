@@ -1,7 +1,6 @@
 .rain-map-time-wrapper {
-    position: relative;
-    display: inline-block;
-	top: 50px;
+    position: absolute;
+    display: block;
 	background: #ccc;
 	padding: 0 10px 0 10px;
 	z-index: 999;
