@@ -9,10 +9,10 @@ Module.register("MMM-RAIN-MAP", {
 		displayClockSymbol: true,
 		extraDelayLastFrameMs: 2000,
 		markers: [
-			{ lat: 49.410, lng: 8.717, zoom: 9, color: "red", hidden: false },
-			{ lat: 49.410, lng: 8.717, zoom: 5, hidden: true },
+			{ lat: 49.41, lng: 8.717, zoom: 9, color: "red", hidden: false },
+			{ lat: 49.41, lng: 8.717, zoom: 5, hidden: true },
 		],
-		markerChangeInterval: 0,
+		markerChangeInterval: 1,
 		mapUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 		mapHeight: "420px",
 		mapWidth: "420px",
@@ -130,6 +130,7 @@ Module.register("MMM-RAIN-MAP", {
 			self.runtimeData.timeframes.length - 1
 				? this.config.extraDelayLastFrameMs
 				: 0;
+
 		this.runtimeData.animationTimer = setTimeout(() => {
 			self.tick();
 			self.play();
@@ -137,6 +138,10 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	tick() {
+		if (!this.runtimeData.map) {
+			return;
+		}
+
 		const nextAnimationPosition =
 			this.runtimeData.animationPosition <
 			this.runtimeData.timeframes.length - 1
@@ -157,7 +162,7 @@ Module.register("MMM-RAIN-MAP", {
 					new L.LatLng(nextMarker.lat, nextMarker.lng),
 					nextMarker.zoom || this.config.defaultZoomLevel,
 					{
-						animation: true,
+						animation: false,
 					}
 				);
 			} else {
@@ -173,10 +178,10 @@ Module.register("MMM-RAIN-MAP", {
 		const nextTimeframe = this.runtimeData.timeframes[nextAnimationPosition];
 		const nextRadarLayer = this.runtimeData.radarLayers[nextTimeframe];
 
-		if(nextRadarLayer){
+		if (nextRadarLayer) {
 			nextRadarLayer.setOpacity(1);
 		}
-		if(currentRadarLayer){
+		if (currentRadarLayer) {
 			currentRadarLayer.setOpacity(0.001);
 		}
 
@@ -202,12 +207,12 @@ Module.register("MMM-RAIN-MAP", {
 					self.runtimeData.timeframes = await response.json();
 
 					// Clear old radar layers
-					for (const timeframe of self.runtimeData.timeframes) {
-						const radarLayer = self.runtimeData.radarLayers[timeframe];
-						if (radarLayer && self.runtimeData.map.hasLayer(radarLayer)) {
-							self.runtimeData.map.removeLayer(radarLayer);
+					self.runtimeData.map.eachLayer((layer) => {
+						if (layer instanceof L.TileLayer && layer._url.includes('rainviewer.com')) {
+							self.runtimeData.map.removeLayer(layer);
 						}
-					}
+					});
+
 					self.runtimeData.radarLayers = [];
 
 					// Add new radar layers
@@ -231,15 +236,21 @@ Module.register("MMM-RAIN-MAP", {
 					self.runtimeData.animationPosition = 0;
 
 					/*
-					console.log("radar layers", Object.keys(self.runtimeData.radarLayers).length)
-					console.log("timeframes", self.runtimeData.timeframes.length)
+					console.log(
+						"radar layers",
+						Object.keys(self.runtimeData.radarLayers).length
+					);
+					console.log("timeframes", self.runtimeData.timeframes.length);
 					var layers = [];
-					self.runtimeData.map.eachLayer(function(layer) {
-						if( layer instanceof L.TileLayer )
+					self.runtimeData.map.eachLayer(function (layer) {
+						if (layer instanceof L.TileLayer) {
+							console.log(layer)
 							layers.push(layer);
+						}
 					});
-					console.log("map layers", layers.length)
+					console.log("map layers", layers.length);
 					*/
+
 					console.log("Done processing RainViewer response.");
 				} else {
 					console.error(

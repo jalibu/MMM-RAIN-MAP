@@ -43,7 +43,7 @@ git clone https://github.com/jalibu/MMM-RAIN-MAP.git
 			{ lat: 49.410, lng: 8.717, zoom: 9, color: "red", hidden: false },
 			{ lat: 49.410, lng: 8.717, zoom: 5, hidden: true },
 		],
-		markerChangeInterval: 0,
+		markerChangeInterval: 2,
 		mapUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 		mapHeight: "420px",
 		mapWidth: "420px",
@@ -65,7 +65,7 @@ git clone https://github.com/jalibu/MMM-RAIN-MAP.git
 | `mapWidth`              | Width of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                    |
 | `markers`               | **Required:** Array of markers or center-points in the map.<br> See examples and Markers-Object documentation below for details. <br><br>**Type:** `array[Markers]` <br> **Default value:** `[]`           |
 | `mapUrl`        | Url of the used map. You can find alternative maps [here](https://wiki.openstreetmap.org/wiki/Tile_servers) in the column `tiles url`,<br>e.g. `https://tiles.wmflabs.org/bw-mapnik/${z}/${x}/${y}.png` for an uncolored map. |
-| `markerChangeInterval`  | If you have more than one marker and set this to a value higher than 0, the map jumps from marker to marker after the given number of intervals. <br><br>**Type:** `number` <br> **Default value:** `0` (off) |
+| `markerChangeInterval`  | If you have more than one marker and set this to a value higher than 0, the map jumps from marker to marker after the given number of intervals. <br><br>**Type:** `number` <br> **Default value:** `1` |
 | `timeFormat`            | Option to override the Magic Mirror's global the time format to 12 or 24 for this module. <br><br>**Type:** `number` <br> **Default value:** `[Global Config]` or `24`                                        |
 | `updateIntervalMs`      | Update interval for fetching new radar frames. (New frames are released every 10 minutes) <br><br>**Type:** `number` <br> **Default value:** `300000` (time in milliseconds)                                  |
 

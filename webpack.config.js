@@ -1,33 +1,5 @@
 const path = require("path");
-const nodeExternals = require("webpack-node-externals");
-const serverConfig = {
-  target: "node",
-  mode: "production",
-  externals: [nodeExternals(), "node_helper"],
-  entry: "./src/server/Server.ts",
-  output: {
-    path: __dirname,
-    filename: "node_helper.js",
-    libraryTarget: "commonjs2"
-  },
-  node: {
-    __dirname: false
-  },
-
-  resolve: {
-    extensions: [".ts"]
-  },
-
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        include: [path.resolve(__dirname, "src/server")],
-        loader: "ts-loader"
-      }
-    ]
-  }
-};
+const TerserPlugin = require('terser-webpack-plugin');
 
 const clientConfig = {
   entry: "./src/client/Client.ts",
@@ -47,7 +19,20 @@ const clientConfig = {
         loader: "ts-loader"
       }
     ]
-  }
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      }),
+    ],
+  },
 };
 
 module.exports = [clientConfig];

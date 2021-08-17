@@ -26,6 +26,7 @@
     "eslint": "^7.25.0",
     "eslint-config-airbnb-typescript-prettier": "^4.2.0",
     "prettier": "^2.2.1",
+    "terser-webpack-plugin": "^5.1.4",
     "ts-loader": "^8.0.14",
     "typescript": "^4.2.4",
     "webpack": "^5.17.0",
