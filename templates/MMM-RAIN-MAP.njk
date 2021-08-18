@@ -1,0 +1,10 @@
+{% if data.timeframes.length > 0 %}
+  <div class="rain-map-wrapper">
+  sdf
+<div id="mapid" style="position: absolute; top: 80px; left: 0; bottom: 0; right: 0;"></div>
+  </div>
+{% else %}
+    <div class="dimmed light small">
+      {{ "LOADING" | translate | safe }}
+    </div>
+{% endif %}
