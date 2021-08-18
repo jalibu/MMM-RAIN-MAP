@@ -19,6 +19,7 @@ declare module Module {
 			start?: Function;
 			play?: Function;
 			tick?: Function;
+			handleCurrentWeatherCondition?: Function;
 		}
 	): void;
 }
@@ -28,6 +29,7 @@ type Config = {
 	defaultZoomLevel: number;
 	displayTime: boolean;
 	displayClockSymbol: boolean;
+	displayOnlyOnRain: boolean;
 	extraDelayLastFrameMs: number;
 	markers: Marker[];
 	mapPositions: MapPosition[];

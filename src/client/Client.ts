@@ -7,6 +7,7 @@ Module.register("MMM-RAIN-MAP", {
 		defaultZoomLevel: 8,
 		displayTime: true,
 		displayClockSymbol: true,
+		displayOnlyOnRain: false,
 		extraDelayLastFrameMs: 2000,
 		markers: [
 			{ lat: 49.41, lng: 8.717, color: "red" },
@@ -38,10 +39,7 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	getStyles() {
-		return [
-			"https://unpkg.com/leaflet@1.7.1/dist/leaflet.css",
-			"MMM-RAIN-MAP.css",
-		];
+		return ["font-awesome.css", "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css", "MMM-RAIN-MAP.css"];
 	},
 
 	getScripts() {
@@ -64,9 +62,7 @@ Module.register("MMM-RAIN-MAP", {
 		if (this.config.displayTime) {
 			const timeWrapperDiv = document.createElement("div");
 			timeWrapperDiv.classList.add("rain-map-time-wrapper");
-			timeWrapperDiv.innerHTML = `${
-				this.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ""
-			}`;
+			timeWrapperDiv.innerHTML = `${this.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ""}`;
 			this.runtimeData.timeDiv = document.createElement("span");
 			this.runtimeData.timeDiv.classList.add("rain-map-time");
 			timeWrapperDiv.appendChild(this.runtimeData.timeDiv);
@@ -91,16 +87,12 @@ Module.register("MMM-RAIN-MAP", {
 		}).setView([firstPosition.lat, firstPosition.lng], firstPosition.zoom);
 
 		// Sanitize map URL
-		L.tileLayer(this.config.mapUrl.split("$").join("")).addTo(
-			this.runtimeData.map
-		);
+		L.tileLayer(this.config.mapUrl.split("$").join("")).addTo(this.runtimeData.map);
 
 		for (const marker of this.config.markers) {
 			L.marker([marker.lat, marker.lng], {
 				icon: new L.Icon({
-					iconUrl: this.file(
-						`img/marker-icon-2x-${Utils.getIconColor(marker)}.png`
-					),
+					iconUrl: this.file(`img/marker-icon-2x-${Utils.getIconColor(marker)}.png`),
 					shadowUrl: this.file(`img/marker-shadow.png`),
 					iconSize: [25, 41],
 					shadowSize: [41, 41],
@@ -130,8 +122,7 @@ Module.register("MMM-RAIN-MAP", {
 	play() {
 		const self = this;
 		const extraDelay =
-			self.runtimeData.animationPosition ===
-			self.runtimeData.timeframes.length - 1
+			self.runtimeData.animationPosition === self.runtimeData.timeframes.length - 1
 				? this.config.extraDelayLastFrameMs
 				: 0;
 
@@ -147,22 +138,18 @@ Module.register("MMM-RAIN-MAP", {
 		}
 
 		const nextAnimationPosition =
-			this.runtimeData.animationPosition <
-			this.runtimeData.timeframes.length - 1
+			this.runtimeData.animationPosition < this.runtimeData.timeframes.length - 1
 				? this.runtimeData.animationPosition + 1
 				: 0;
 
 		// Manage map positions
 		if (nextAnimationPosition === 0 && this.config.mapPositions.length > 1) {
-			const currentMapPosition =
-				this.config.mapPositions[this.runtimeData.mapPosition];
+			const currentMapPosition = this.config.mapPositions[this.runtimeData.mapPosition];
 
 			if (this.runtimeData.loopNumber === (currentMapPosition.loops || 1)) {
 				this.runtimeData.loopNumber = 1;
 				const nextMapPosition =
-					this.runtimeData.mapPosition === this.config.mapPositions.length - 1
-						? 0
-						: this.runtimeData.mapPosition + 1;
+					this.runtimeData.mapPosition === this.config.mapPositions.length - 1 ? 0 : this.runtimeData.mapPosition + 1;
 				this.runtimeData.mapPosition = nextMapPosition;
 				const nextPosition = this.config.mapPositions[nextMapPosition];
 				this.runtimeData.map.setView(
@@ -178,8 +165,7 @@ Module.register("MMM-RAIN-MAP", {
 		}
 
 		// Manage radar layers
-		const currentTimeframe =
-			this.runtimeData.timeframes[this.runtimeData.animationPosition];
+		const currentTimeframe = this.runtimeData.timeframes[this.runtimeData.animationPosition];
 		const currentRadarLayer = this.runtimeData.radarLayers[currentTimeframe];
 
 		const nextTimeframe = this.runtimeData.timeframes[nextAnimationPosition];
@@ -207,53 +193,83 @@ Module.register("MMM-RAIN-MAP", {
 
 	loadData() {
 		const self = this;
-		fetch("https://api.rainviewer.com/public/maps.json").then(
-			async (response) => {
-				if (response.ok) {
-					self.runtimeData.timeframes = await response.json();
+		fetch("https://api.rainviewer.com/public/maps.json").then(async (response) => {
+			if (response.ok) {
+				self.runtimeData.timeframes = await response.json();
 
-					// Clear old radar layers
-					self.runtimeData.map.eachLayer((layer) => {
-						if (
-							layer instanceof L.TileLayer &&
-							layer._url.includes("rainviewer.com")
-						) {
-							self.runtimeData.map.removeLayer(layer);
-						}
-					});
-
-					self.runtimeData.radarLayers = [];
-
-					// Add new radar layers
-					for (const timeframe of self.runtimeData.timeframes) {
-						const radarLayer = new L.TileLayer(
-							"https://tilecache.rainviewer.com/v2/radar/" +
-								timeframe +
-								"/256/{z}/{x}/{y}/2/1_1.png",
-							{
-								tileSize: 256,
-								opacity: 0.001,
-								zIndex: timeframe,
-							}
-						);
-						self.runtimeData.radarLayers[timeframe] = radarLayer;
-						if (!self.runtimeData.map.hasLayer(radarLayer)) {
-							self.runtimeData.map.addLayer(radarLayer);
-						}
+				// Clear old radar layers
+				self.runtimeData.map.eachLayer((layer) => {
+					if (layer instanceof L.TileLayer && layer._url.includes("rainviewer.com")) {
+						self.runtimeData.map.removeLayer(layer);
 					}
+				});
 
-					self.runtimeData.animationPosition = 0;
+				self.runtimeData.radarLayers = [];
 
-					console.debug("Done processing latest RainViewer API request.");
-				} else {
-					console.error(
-						"Error fetching RainViewer timeframes",
-						response.statusText
+				// Add new radar layers
+				for (const timeframe of self.runtimeData.timeframes) {
+					const radarLayer = new L.TileLayer(
+						"https://tilecache.rainviewer.com/v2/radar/" + timeframe + "/256/{z}/{x}/{y}/2/1_1.png",
+						{
+							tileSize: 256,
+							opacity: 0.001,
+							zIndex: timeframe,
+						}
 					);
+					self.runtimeData.radarLayers[timeframe] = radarLayer;
+					if (!self.runtimeData.map.hasLayer(radarLayer)) {
+						self.runtimeData.map.addLayer(radarLayer);
+					}
 				}
+
+				self.runtimeData.animationPosition = 0;
+
+				console.debug("Done processing latest RainViewer API request.");
+			} else {
+				console.error("Error fetching RainViewer timeframes", response.statusText);
 			}
-		);
+		});
 	},
 
-	notificationReceived(notificationIdentifier: string, payload: any) {},
+	notificationReceived(notificationIdentifier: string, payload: any) {
+		if(this.config.displayOnlyOnRain){
+			if (notificationIdentifier === "OPENWEATHER_FORECAST_WEATHER_UPDATE") {
+				const currentCondition = payload.current?.weather[0]?.icon;
+				this.handleCurrentWeatherCondition(currentCondition);
+			} else if (notificationIdentifier === "CURRENTWEATHER_TYPE") {
+				const currentCondition = payload.type;
+				this.handleCurrentWeatherCondition(currentCondition);
+			}
+		}
+	},
+
+	handleCurrentWeatherCondition(currentCondition: string) {
+		const rainConditions = [
+			"09d",
+			"09n",
+			"10d",
+			"10n",
+			"11d",
+			"11n",
+			"13d",
+			"13n",
+			"showers",
+			"thunderstorm",
+			"sleet",
+			"rain",
+			"snow",
+		];
+		if (currentCondition && rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
+			if (this.runtimeData.animationTimer) {
+				this.hide();
+				clearTimeout(this.runtimeData.animationTimer);
+				this.runtimeData.animationTimer = null;
+			}
+		} else {
+			if (!this.runtimeData.animationTimer) {
+				this.show();
+				this.play();
+			}
+		}
+	},
 });
