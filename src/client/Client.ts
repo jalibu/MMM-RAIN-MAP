@@ -3,16 +3,22 @@ import Utils from "./Utils";
 
 Module.register("MMM-RAIN-MAP", {
 	defaults: {
-		animationSpeedMs: 600,
+		animationSpeedMs: 400,
 		defaultZoomLevel: 8,
 		displayTime: true,
 		displayClockSymbol: true,
 		extraDelayLastFrameMs: 2000,
 		markers: [
-			{ lat: 49.41, lng: 8.717, zoom: 9, color: "red", hidden: false },
-			{ lat: 49.41, lng: 8.717, zoom: 5, hidden: true },
+			{ lat: 49.41, lng: 8.717, color: "red" },
+			{ lat: 48.856, lng: 2.35, color: "green" },
 		],
-		markerChangeInterval: 1,
+		mapPositions: [
+			{ lat: 49.41, lng: 8.717, zoom: 9, loops: 1 },
+			{ lat: 49.41, lng: 8.717, zoom: 6, loops: 2 },
+			{ lat: 48.856, lng: 2.35, zoom: 6, loops: 1 },
+			{ lat: 48.856, lng: 2.35, zoom: 9, loops: 2 },
+			{ lat: 49.15, lng: 6.154, zoom: 5, loops: 2 },
+		],
 		mapUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 		mapHeight: "420px",
 		mapWidth: "420px",
@@ -26,7 +32,7 @@ Module.register("MMM-RAIN-MAP", {
 		radarLayers: [],
 		animationTimer: null,
 		animationPosition: 0,
-		markerPosition: 0,
+		mapPosition: 0,
 		loopNumber: 1,
 		timeDiv: null,
 	},
@@ -38,7 +44,7 @@ Module.register("MMM-RAIN-MAP", {
 		];
 	},
 
-	getScripts: function () {
+	getScripts() {
 		return ["moment.js", "moment-timezone.js"];
 	},
 
@@ -76,13 +82,13 @@ Module.register("MMM-RAIN-MAP", {
 		// Temporary add app-wrapper to body, otherwise leaflet won't initialize correctly
 		document.body.appendChild(app);
 
-		const firstMarker = this.config.markers[0];
+		const firstPosition = this.config.mapPositions[0];
 
 		this.runtimeData.map = L.map(mapDiv, {
 			zoomControl: false,
 			trackResize: false,
 			attributionControl: false,
-		}).setView([firstMarker.lat, firstMarker.lng], firstMarker.zoom);
+		}).setView([firstPosition.lat, firstPosition.lng], firstPosition.zoom);
 
 		// Sanitize map URL
 		L.tileLayer(this.config.mapUrl.split("$").join("")).addTo(
@@ -90,18 +96,16 @@ Module.register("MMM-RAIN-MAP", {
 		);
 
 		for (const marker of this.config.markers) {
-			if (!marker.hidden) {
-				L.marker([marker.lat, marker.lng], {
-					icon: new L.Icon({
-						iconUrl: this.file(
-							`img/marker-icon-2x-${Utils.getIconColor(marker)}.png`
-						),
-						shadowUrl: this.file(`img/marker-shadow.png`),
-						iconSize: [25, 41],
-						shadowSize: [41, 41],
-					}),
-				}).addTo(this.runtimeData.map);
-			}
+			L.marker([marker.lat, marker.lng], {
+				icon: new L.Icon({
+					iconUrl: this.file(
+						`img/marker-icon-2x-${Utils.getIconColor(marker)}.png`
+					),
+					shadowUrl: this.file(`img/marker-shadow.png`),
+					iconSize: [25, 41],
+					shadowSize: [41, 41],
+				}),
+			}).addTo(this.runtimeData.map);
 		}
 
 		// Once the map is initialized, we can remove the app-wrapper from the body and return it to the getDom() function
@@ -138,7 +142,7 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	tick() {
-		if (!this.runtimeData.map) {
+		if (!this.runtimeData.map || this.runtimeData.timeframes.length === 0) {
 			return;
 		}
 
@@ -148,19 +152,22 @@ Module.register("MMM-RAIN-MAP", {
 				? this.runtimeData.animationPosition + 1
 				: 0;
 
-		// Manage map
-		if (nextAnimationPosition === 0 && this.config.markerChangeInterval > 0) {
-			if (this.runtimeData.loopNumber === this.config.markerChangeInterval) {
+		// Manage map positions
+		if (nextAnimationPosition === 0 && this.config.mapPositions.length > 1) {
+			const currentMapPosition =
+				this.config.mapPositions[this.runtimeData.mapPosition];
+
+			if (this.runtimeData.loopNumber === (currentMapPosition.loops || 1)) {
 				this.runtimeData.loopNumber = 1;
-				const nextMarkerPosition =
-					this.runtimeData.markerPosition === this.config.markers.length - 1
+				const nextMapPosition =
+					this.runtimeData.mapPosition === this.config.mapPositions.length - 1
 						? 0
-						: this.runtimeData.markerPosition + 1;
-				this.runtimeData.markerPosition = nextMarkerPosition;
-				const nextMarker = this.config.markers[nextMarkerPosition];
+						: this.runtimeData.mapPosition + 1;
+				this.runtimeData.mapPosition = nextMapPosition;
+				const nextPosition = this.config.mapPositions[nextMapPosition];
 				this.runtimeData.map.setView(
-					new L.LatLng(nextMarker.lat, nextMarker.lng),
-					nextMarker.zoom || this.config.defaultZoomLevel,
+					new L.LatLng(nextPosition.lat, nextPosition.lng),
+					nextPosition.zoom || this.config.defaultZoomLevel,
 					{
 						animation: false,
 					}
@@ -199,7 +206,6 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	loadData() {
-		console.log("Calling RainViewer API for updates");
 		const self = this;
 		fetch("https://api.rainviewer.com/public/maps.json").then(
 			async (response) => {
@@ -208,7 +214,10 @@ Module.register("MMM-RAIN-MAP", {
 
 					// Clear old radar layers
 					self.runtimeData.map.eachLayer((layer) => {
-						if (layer instanceof L.TileLayer && layer._url.includes('rainviewer.com')) {
+						if (
+							layer instanceof L.TileLayer &&
+							layer._url.includes("rainviewer.com")
+						) {
 							self.runtimeData.map.removeLayer(layer);
 						}
 					});
@@ -235,23 +244,7 @@ Module.register("MMM-RAIN-MAP", {
 
 					self.runtimeData.animationPosition = 0;
 
-					/*
-					console.log(
-						"radar layers",
-						Object.keys(self.runtimeData.radarLayers).length
-					);
-					console.log("timeframes", self.runtimeData.timeframes.length);
-					var layers = [];
-					self.runtimeData.map.eachLayer(function (layer) {
-						if (layer instanceof L.TileLayer) {
-							console.log(layer)
-							layers.push(layer);
-						}
-					});
-					console.log("map layers", layers.length);
-					*/
-
-					console.log("Done processing RainViewer response.");
+					console.debug("Done processing latest RainViewer API request.");
 				} else {
 					console.error(
 						"Error fetching RainViewer timeframes",
