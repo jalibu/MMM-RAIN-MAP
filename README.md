@@ -44,7 +44,7 @@ If you like this module and want to thank, please buy me a beer.
 				{ lat: 49.41, lng: 8.717, color: "red" },
 				{ lat: 48.856, lng: 2.35, color: "green" },
 			],
-			zoomPositions: [
+			mapPositions: [
 				{ lat: 49.41, lng: 8.717, zoom: 9, loops: 1 },
 				{ lat: 49.41, lng: 8.717, zoom: 6, loops: 2 },
 				{ lat: 48.856, lng: 2.35, zoom: 6, loops: 1 },
