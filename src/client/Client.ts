@@ -232,7 +232,7 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	notificationReceived(notificationIdentifier: string, payload: any) {
-		if(this.config.displayOnlyOnRain){
+		if (this.config.displayOnlyOnRain) {
 			if (notificationIdentifier === "OPENWEATHER_FORECAST_WEATHER_UPDATE") {
 				const currentCondition = payload.current?.weather[0]?.icon;
 				this.handleCurrentWeatherCondition(currentCondition);
@@ -260,15 +260,15 @@ Module.register("MMM-RAIN-MAP", {
 			"snow",
 		];
 		if (currentCondition && rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
+			if (!this.runtimeData.animationTimer) {
+				this.show();
+				this.play();
+			}
+		} else {
 			if (this.runtimeData.animationTimer) {
 				this.hide();
 				clearTimeout(this.runtimeData.animationTimer);
 				this.runtimeData.animationTimer = null;
-			}
-		} else {
-			if (!this.runtimeData.animationTimer) {
-				this.show();
-				this.play();
 			}
 		}
 	},
