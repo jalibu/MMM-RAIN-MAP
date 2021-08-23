@@ -261,12 +261,12 @@ Module.register("MMM-RAIN-MAP", {
 		];
 		if (currentCondition && rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
 			if (!this.runtimeData.animationTimer) {
-				this.show();
+				this.show(300, {lockString: this.identifier});
 				this.play();
 			}
 		} else {
 			if (this.runtimeData.animationTimer) {
-				this.hide();
+				this.hide(300, {lockString: this.identifier});
 				clearTimeout(this.runtimeData.animationTimer);
 				this.runtimeData.animationTimer = null;
 			}
