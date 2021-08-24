@@ -26,9 +26,11 @@ declare module Module {
 
 type Config = {
 	animationSpeedMs: number;
+	colorizeTime: boolean;
 	defaultZoomLevel: number;
 	displayTime: boolean;
 	displayClockSymbol: boolean;
+	displayTimeline: boolean;
 	displayOnlyOnRain: boolean;
 	extraDelayLastFrameMs: number;
 	extraDelayCurrentFrameMs: number;

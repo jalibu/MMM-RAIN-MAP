@@ -3,10 +3,12 @@ import Utils from "./Utils";
 
 Module.register("MMM-RAIN-MAP", {
 	defaults: {
-		animationSpeedMs: 1000,
+		animationSpeedMs: 400,
+		colorizeTime: true,
 		defaultZoomLevel: 8,
-		displayTime: true,
 		displayClockSymbol: true,
+		displayTime: true,
+		displayTimeline: true,
 		displayOnlyOnRain: false,
 		extraDelayLastFrameMs: 2000,
 		extraDelayCurrentFrameMs: 2000,
@@ -70,17 +72,20 @@ Module.register("MMM-RAIN-MAP", {
 			this.runtimeData.timeDiv.classList.add("rain-map-time");
 			timeWrapperDiv.appendChild(this.runtimeData.timeDiv);
 
-			const timelineWrapper = document.createElement("span");
-			timelineWrapper.classList.add("rain-map-timeline-wrapper");
+			if (this.config.displayTimeline) {
+				const timelineWrapper = document.createElement("span");
+				timelineWrapper.classList.add("rain-map-timeline-wrapper");
 
-			this.runtimeData.sliderDiv = document.createElement("span");
-			this.runtimeData.sliderDiv.classList.add("rain-map-timeslider");
-			timelineWrapper.appendChild(this.runtimeData.sliderDiv);
-			this.runtimeData.timelineDiv = document.createElement("span");
-			this.runtimeData.timelineDiv.classList.add("rain-map-timeline");
-			timelineWrapper.appendChild(this.runtimeData.timelineDiv);
+				this.runtimeData.sliderDiv = document.createElement("span");
+				this.runtimeData.sliderDiv.classList.add("rain-map-timeslider");
+				timelineWrapper.appendChild(this.runtimeData.sliderDiv);
+				this.runtimeData.timelineDiv = document.createElement("span");
+				this.runtimeData.timelineDiv.classList.add("rain-map-timeline");
+				timelineWrapper.appendChild(this.runtimeData.timelineDiv);
 
-			timeWrapperDiv.appendChild(timelineWrapper);
+				timeWrapperDiv.appendChild(timelineWrapper);
+			}
+
 			app.appendChild(timeWrapperDiv);
 		}
 
@@ -136,11 +141,11 @@ Module.register("MMM-RAIN-MAP", {
 
 	play() {
 		const self = this;
-		let extraDelay = 0
-		if(self.runtimeData.animationPosition === self.runtimeData.timeframes.length - 1) {
-			extraDelay = this.config.extraDelayLastFrameMs
-		} else if(self.runtimeData.animationPosition === this.runtimeData.numHistoryFrames - 1){
-			extraDelay = this.config.extraDelayCurrentFrameMs
+		let extraDelay = 0;
+		if (self.runtimeData.animationPosition === self.runtimeData.timeframes.length - 1) {
+			extraDelay = this.config.extraDelayLastFrameMs;
+		} else if (self.runtimeData.animationPosition === this.runtimeData.numHistoryFrames - 1) {
+			extraDelay = this.config.extraDelayCurrentFrameMs;
 		}
 
 		this.runtimeData.animationTimer = setTimeout(() => {
@@ -204,9 +209,25 @@ Module.register("MMM-RAIN-MAP", {
 			const hourSymbol = this.config.timeFormat === 24 ? "HH" : "h";
 			this.runtimeData.timeDiv.innerHTML = `${time.format(hourSymbol + ":mm")}`;
 
-			if(nextAnimationPosition)
+			if (this.config.colorizeTime) {
+				if (nextAnimationPosition < this.runtimeData.numHistoryFrames - 1) {
+					this.runtimeData.timeDiv.classList.remove("rain-map-forecast");
+					this.runtimeData.timeDiv.classList.remove("rain-map-now");
+					this.runtimeData.timeDiv.classList.add("rain-map-history");
+				} else if (nextAnimationPosition === this.runtimeData.numHistoryFrames - 1) {
+					this.runtimeData.timeDiv.classList.remove("rain-map-forecast");
+					this.runtimeData.timeDiv.classList.add("rain-map-now");
+					this.runtimeData.timeDiv.classList.remove("rain-map-history");
+				} else {
+					this.runtimeData.timeDiv.classList.add("rain-map-forecast");
+					this.runtimeData.timeDiv.classList.remove("rain-map-now");
+					this.runtimeData.timeDiv.classList.remove("rain-map-history");
+				}
+			}
 
-			this.runtimeData.sliderDiv.style.left = `${this.runtimeData.percentPerFrame * nextAnimationPosition}%`;
+			if (this.config.displayTimeline) {
+				this.runtimeData.sliderDiv.style.left = `${this.runtimeData.percentPerFrame * nextAnimationPosition}%`;
+			}
 		}
 		this.runtimeData.animationPosition = nextAnimationPosition;
 	},
@@ -248,14 +269,18 @@ Module.register("MMM-RAIN-MAP", {
 				self.runtimeData.animationPosition = 0;
 
 				// Prepare timeline
-				try {
-					this.runtimeData.percentPerFrame =
-						100 / (self.runtimeData.numHistoryFrames + self.runtimeData.numForecastFrames);
-					const historyPart = (self.runtimeData.numHistoryFrames - 1) * this.runtimeData.percentPerFrame;
-					const forecastPart = (self.runtimeData.numForecastFrames) * this.runtimeData.percentPerFrame;
-					this.runtimeData.timelineDiv.style.background = `linear-gradient(to right, var(--color-history) 0% ${historyPart}%, var(--color-now) ${historyPart}% ${historyPart + this.runtimeData.percentPerFrame}%, var(--color-forecast) ${forecastPart}%)`;
-				} catch (err) {
-					console.warn("Error rendering the map timeline");
+				if (this.config.displayTimeline) {
+					try {
+						this.runtimeData.percentPerFrame =
+							100 / (self.runtimeData.numHistoryFrames + self.runtimeData.numForecastFrames);
+						const historyPart = (self.runtimeData.numHistoryFrames - 1) * this.runtimeData.percentPerFrame;
+						const forecastPart = self.runtimeData.numForecastFrames * this.runtimeData.percentPerFrame;
+						this.runtimeData.timelineDiv.style.background = `linear-gradient(to right, var(--color-history) 0% ${historyPart}%, var(--color-now) ${historyPart}% ${
+							historyPart + this.runtimeData.percentPerFrame
+						}%, var(--color-forecast) ${forecastPart}%)`;
+					} catch (err) {
+						console.warn("Error rendering the map timeline");
+					}
 				}
 
 				console.debug("Done processing latest RainViewer API request.");
