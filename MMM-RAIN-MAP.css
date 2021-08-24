@@ -1,6 +1,9 @@
 .rain-map-time-wrapper {
-    position: absolute;
-    display: block;
+	--color-history: #000;
+	--color-now: #ffae00;
+	--color-forecast: #ff0074;
+	position: absolute;
+	display: block;
 	background: #ccc;
 	padding: 0 10px 0 10px;
 	z-index: 999;
@@ -10,4 +13,19 @@
 }
 .rain-map-time-wrapper i {
 	margin-right: 6px;
+}
+
+.rain-map-timeslider {
+	background-color: #000;
+	height: 10px;
+	width: 2px;
+	margin-left: -1px;
+	position: relative;
+	display: block;
+}
+
+.rain-map-timeline {
+	display: block;
+	height: 4px;
+	margin-bottom: 5px;
 }
