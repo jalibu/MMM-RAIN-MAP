@@ -166,10 +166,10 @@ Module.register("MMM-RAIN-MAP", {
 
 		// Manage radar layers
 		const currentTimeframe = this.runtimeData.timeframes[this.runtimeData.animationPosition];
-		const currentRadarLayer = this.runtimeData.radarLayers[currentTimeframe];
+		const currentRadarLayer = this.runtimeData.radarLayers[currentTimeframe.time];
 
 		const nextTimeframe = this.runtimeData.timeframes[nextAnimationPosition];
-		const nextRadarLayer = this.runtimeData.radarLayers[nextTimeframe];
+		const nextRadarLayer = this.runtimeData.radarLayers[nextTimeframe.time];
 
 		if (nextRadarLayer) {
 			nextRadarLayer.setOpacity(1);
@@ -182,7 +182,7 @@ Module.register("MMM-RAIN-MAP", {
 
 		// Manage time
 		if (this.config.displayTime) {
-			const time = moment(nextTimeframe * 1000);
+			const time = moment(nextTimeframe.time * 1000);
 			if (this.config.timezone) {
 				time.tz(this.config.timezone);
 			}
@@ -193,9 +193,11 @@ Module.register("MMM-RAIN-MAP", {
 
 	loadData() {
 		const self = this;
-		fetch("https://api.rainviewer.com/public/maps.json").then(async (response) => {
+		fetch("https://api.rainviewer.com/public/weather-maps.json").then(async (response) => {
 			if (response.ok) {
-				self.runtimeData.timeframes = await response.json();
+				const results = await response.json();
+				self.runtimeData.timeframes = results.radar.past;
+				self.runtimeData.timeframes.push(... results.radar.nowcast)
 
 				// Clear old radar layers
 				self.runtimeData.map.eachLayer((layer) => {
@@ -209,14 +211,14 @@ Module.register("MMM-RAIN-MAP", {
 				// Add new radar layers
 				for (const timeframe of self.runtimeData.timeframes) {
 					const radarLayer = new L.TileLayer(
-						"https://tilecache.rainviewer.com/v2/radar/" + timeframe + "/256/{z}/{x}/{y}/2/1_1.png",
+						"https://tilecache.rainviewer.com" + timeframe.path + "/256/{z}/{x}/{y}/2/1_1.png",
 						{
 							tileSize: 256,
 							opacity: 0.001,
 							zIndex: timeframe,
 						}
 					);
-					self.runtimeData.radarLayers[timeframe] = radarLayer;
+					self.runtimeData.radarLayers[timeframe.time] = radarLayer;
 					if (!self.runtimeData.map.hasLayer(radarLayer)) {
 						self.runtimeData.map.addLayer(radarLayer);
 					}
