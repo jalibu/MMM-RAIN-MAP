@@ -4,11 +4,14 @@ import Utils from "./Utils";
 Module.register("MMM-RAIN-MAP", {
 	defaults: {
 		animationSpeedMs: 400,
+		colorizeTime: true,
 		defaultZoomLevel: 8,
-		displayTime: true,
 		displayClockSymbol: true,
+		displayTime: true,
+		displayTimeline: true,
 		displayOnlyOnRain: false,
 		extraDelayLastFrameMs: 2000,
+		extraDelayCurrentFrameMs: 2000,
 		markers: [
 			{ lat: 49.41, lng: 8.717, color: "red" },
 			{ lat: 48.856, lng: 2.35, color: "green" },
@@ -28,18 +31,20 @@ Module.register("MMM-RAIN-MAP", {
 	},
 
 	runtimeData: {
-		map: null,
-		timeframes: [],
-		radarLayers: [],
-		animationTimer: null,
 		animationPosition: 0,
+		animationTimer: null,
+		map: null,
 		mapPosition: 0,
+		numHistoryFrames: 0,
+		numForecastFrames: 0,
 		loopNumber: 1,
+		radarLayers: [],
 		timeDiv: null,
+		timeframes: [],
 	},
 
 	getStyles() {
-		return ["font-awesome.css", "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css", "MMM-RAIN-MAP.css"];
+		return ["font-awesome.css", "leaflet.css", "MMM-RAIN-MAP.css"];
 	},
 
 	getScripts() {
@@ -66,6 +71,21 @@ Module.register("MMM-RAIN-MAP", {
 			this.runtimeData.timeDiv = document.createElement("span");
 			this.runtimeData.timeDiv.classList.add("rain-map-time");
 			timeWrapperDiv.appendChild(this.runtimeData.timeDiv);
+
+			if (this.config.displayTimeline) {
+				const timelineWrapper = document.createElement("span");
+				timelineWrapper.classList.add("rain-map-timeline-wrapper");
+
+				this.runtimeData.sliderDiv = document.createElement("span");
+				this.runtimeData.sliderDiv.classList.add("rain-map-timeslider");
+				timelineWrapper.appendChild(this.runtimeData.sliderDiv);
+				this.runtimeData.timelineDiv = document.createElement("span");
+				this.runtimeData.timelineDiv.classList.add("rain-map-timeline");
+				timelineWrapper.appendChild(this.runtimeData.timelineDiv);
+
+				timeWrapperDiv.appendChild(timelineWrapper);
+			}
+
 			app.appendChild(timeWrapperDiv);
 		}
 
@@ -121,10 +141,12 @@ Module.register("MMM-RAIN-MAP", {
 
 	play() {
 		const self = this;
-		const extraDelay =
-			self.runtimeData.animationPosition === self.runtimeData.timeframes.length - 1
-				? this.config.extraDelayLastFrameMs
-				: 0;
+		let extraDelay = 0;
+		if (self.runtimeData.animationPosition === self.runtimeData.timeframes.length - 1) {
+			extraDelay = this.config.extraDelayLastFrameMs;
+		} else if (self.runtimeData.animationPosition === this.runtimeData.numHistoryFrames - 1) {
+			extraDelay = this.config.extraDelayCurrentFrameMs;
+		}
 
 		this.runtimeData.animationTimer = setTimeout(() => {
 			self.tick();
@@ -178,8 +200,6 @@ Module.register("MMM-RAIN-MAP", {
 			currentRadarLayer.setOpacity(0.001);
 		}
 
-		this.runtimeData.animationPosition = nextAnimationPosition;
-
 		// Manage time
 		if (this.config.displayTime) {
 			const time = moment(nextTimeframe.time * 1000);
@@ -188,7 +208,28 @@ Module.register("MMM-RAIN-MAP", {
 			}
 			const hourSymbol = this.config.timeFormat === 24 ? "HH" : "h";
 			this.runtimeData.timeDiv.innerHTML = `${time.format(hourSymbol + ":mm")}`;
+
+			if (this.config.colorizeTime) {
+				if (nextAnimationPosition < this.runtimeData.numHistoryFrames - 1) {
+					this.runtimeData.timeDiv.classList.remove("rain-map-forecast");
+					this.runtimeData.timeDiv.classList.remove("rain-map-now");
+					this.runtimeData.timeDiv.classList.add("rain-map-history");
+				} else if (nextAnimationPosition === this.runtimeData.numHistoryFrames - 1) {
+					this.runtimeData.timeDiv.classList.remove("rain-map-forecast");
+					this.runtimeData.timeDiv.classList.add("rain-map-now");
+					this.runtimeData.timeDiv.classList.remove("rain-map-history");
+				} else {
+					this.runtimeData.timeDiv.classList.add("rain-map-forecast");
+					this.runtimeData.timeDiv.classList.remove("rain-map-now");
+					this.runtimeData.timeDiv.classList.remove("rain-map-history");
+				}
+			}
+
+			if (this.config.displayTimeline) {
+				this.runtimeData.sliderDiv.style.left = `${this.runtimeData.percentPerFrame * nextAnimationPosition}%`;
+			}
 		}
+		this.runtimeData.animationPosition = nextAnimationPosition;
 	},
 
 	loadData() {
@@ -196,7 +237,9 @@ Module.register("MMM-RAIN-MAP", {
 		fetch("https://api.rainviewer.com/public/weather-maps.json").then(async (response) => {
 			if (response.ok) {
 				const results = await response.json();
-				self.runtimeData.timeframes = [... results.radar.past, ... results.radar.nowcast];
+				self.runtimeData.numHistoryFrames = results.radar?.past?.length || 0;
+				self.runtimeData.numForecastFrames = results.radar?.nowcast?.length || 0;
+				self.runtimeData.timeframes = [...results.radar.past, ...results.radar.nowcast];
 
 				// Clear old radar layers
 				self.runtimeData.map.eachLayer((layer) => {
@@ -224,6 +267,21 @@ Module.register("MMM-RAIN-MAP", {
 				}
 
 				self.runtimeData.animationPosition = 0;
+
+				// Prepare timeline
+				if (this.config.displayTimeline) {
+					try {
+						this.runtimeData.percentPerFrame =
+							100 / (self.runtimeData.numHistoryFrames + self.runtimeData.numForecastFrames);
+						const historyPart = (self.runtimeData.numHistoryFrames - 1) * this.runtimeData.percentPerFrame;
+						const forecastPart = self.runtimeData.numForecastFrames * this.runtimeData.percentPerFrame;
+						this.runtimeData.timelineDiv.style.background = `linear-gradient(to right, var(--color-history) 0% ${historyPart}%, var(--color-now) ${historyPart}% ${
+							historyPart + this.runtimeData.percentPerFrame
+						}%, var(--color-forecast) ${forecastPart}%)`;
+					} catch (err) {
+						console.warn("Error rendering the map timeline");
+					}
+				}
 
 				console.debug("Done processing latest RainViewer API request.");
 			} else {
@@ -262,12 +320,12 @@ Module.register("MMM-RAIN-MAP", {
 		];
 		if (currentCondition && rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
 			if (!this.runtimeData.animationTimer) {
-				this.show(300, {lockString: this.identifier});
+				this.show(300, { lockString: this.identifier });
 				this.play();
 			}
 		} else {
 			if (this.runtimeData.animationTimer) {
-				this.hide(300, {lockString: this.identifier});
+				this.hide(300, { lockString: this.identifier });
 				clearTimeout(this.runtimeData.animationTimer);
 				this.runtimeData.animationTimer = null;
 			}

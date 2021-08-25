@@ -26,11 +26,14 @@ declare module Module {
 
 type Config = {
 	animationSpeedMs: number;
+	colorizeTime: boolean;
 	defaultZoomLevel: number;
 	displayTime: boolean;
 	displayClockSymbol: boolean;
+	displayTimeline: boolean;
 	displayOnlyOnRain: boolean;
 	extraDelayLastFrameMs: number;
+	extraDelayCurrentFrameMs: number;
 	markers: Marker[];
 	mapPositions: MapPosition[];
 	mapUrl: string;
@@ -54,14 +57,16 @@ type MapPosition = {
 };
 
 type RuntimeData = {
-	map: any;
-	timeframes: number[];
-	radarLayers: any[];
 	animationTimer: any;
 	animationPosition: number;
+	map: any;
 	mapPosition: number;
+	numHistoryFrames: number;
+	numForecastFrames: number;
+	radarLayers: any[];
 	loopNumber: number;
 	timeDiv: Element;
+	timeframes: number[];
 };
 
 declare const moment: Function;

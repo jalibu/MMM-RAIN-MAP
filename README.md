@@ -11,6 +11,9 @@ If you like this module and want to thank, please buy me a beer.
 ## Features
 
 - Displays Rainviewer.com radar layers on OpenStreetMap
+  * Every 10 minutes a new weather snapshot is published
+  * The snapshots of the last 2 hours are available, which show the weather events of the past
+  * Additionally 3 layers are displayed as forecast of the next 30 minutes
 - Option to place multiple markers on map  
 - Option for multiple, alternating map positions
 - Option to only show in current rainy weather conditions. Works only together with [weather](https://github.com/MichMich/MagicMirror/tree/master/modules/default/weather) or [MMM-OpenWeatherForecast](https://github.com/jclarke0000/MMM-OpenWeatherForecast) as dependency.
@@ -34,11 +37,14 @@ If you like this module and want to thank, please buy me a beer.
 		position: "top_left",
 		config: {
 			animationSpeedMs: 400,
+			colorizeTime: true,
 			defaultZoomLevel: 8,
 			displayTime: true,
+			displayTimeline: true,
 			displayClockSymbol: true,
 			displayOnlyOnRain: false,
-			extraDelayLastFrameMs: 2000,
+			extraDelayLastFrameMs: 1000,
+			extraDelayCurrentFrameMs: 3000,
 			markers: [
 				{ lat: 49.41, lng: 8.717, color: "red" },
 				{ lat: 48.856, lng: 2.35, color: "green" },
@@ -63,11 +69,14 @@ If you like this module and want to thank, please buy me a beer.
 | Option                  | Description                                                                                                                                                                                                |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `animationSpeedMs`      | Determines how fast the frames are played. <br><br>**Type:** `int` <br> **Default value:** `400` (time per frame in milliseconds)                                                                          |
+| `colorizeTime`    | Set true, to colorize history and forecast timestamps. <br><br>**Type:** `boolean` <br> **Default value:** `true`              |
 | `defaultZoomLevel`      | Fallback/default zoom value that is used if it is not explicitly set in a MapPostion. <br><br>**Type:** `int`<br>**Range:** `0 (hole world) - 20 (small building)`<br> **Default value:** `8`  |
 | `displayTime`           | Set true, to display the time for each frame. <br><br>**Type:** `boolean` <br> **Default value:** `true`         |
 | `displayClockSymbol`    | Set true, to display a clock symbol as time prefix. <br><br>**Type:** `boolean` <br> **Default value:** `true`              |
+| `displayTimeline`    | Set true, to display a timeline. <br><br>**Type:** `boolean` <br> **Default value:** `true`              |
 | `displayOnlyOnRain`     | Set true, to only show the map if supported weather modules broadcast a current rainy weather condition.<br>Supported weather modules are: [weather](https://github.com/MichMich/MagicMirror/tree/master/modules/default/weather) and [MMM-OpenWeatherForecast](https://github.com/jclarke0000/MMM-OpenWeatherForecast). <br><br>**Type:** `boolean` <br> **Default value:** `false`              |
-| `extraDelayLastFrameMs` | Add an extra delay to pause the animation on the latest frame (current weather situation).<br><br>**Type:** `int` <br> **Default value:** `2000` (time in milliseconds)    |
+| `extraDelayLastFrameMs` | Add an extra delay to pause the animation on the last frame (last available forecast weather situation).<br><br>**Type:** `int` <br> **Default value:** `1000` (time in milliseconds)    |
+| `extraDelayCurrentFrameMs` | Add an extra delay to pause the animation on the frame for the current weather situation.<br><br>**Type:** `int` <br> **Default value:** `3000` (time in milliseconds)    |
 | `markers`               | Optional list of markers on the map.<br> See examples and Markers-Object documentation below for details. <br><br>**Type:** `array[Marker]` <br> **Default value:** `Sample set`           |
 | `mapPositions`         | **Required:** List of zoom/center positions for the map.<br> See examples and MapPosition-Object documentation below for details. <br><br>**Type:** `array[MapPosition]` <br> **Default value:** `Sample set`           |
 | `mapHeight`             | Height of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                   |

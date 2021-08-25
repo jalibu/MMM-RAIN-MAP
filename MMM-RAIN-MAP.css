@@ -1,13 +1,46 @@
 .rain-map-time-wrapper {
-    position: absolute;
-    display: block;
+	--color-history: #003AFF;
+	--color-now: #000;
+	--color-forecast: #ff0074;
+	position: absolute;
+	display: block;
 	background: #ccc;
 	padding: 0 10px 0 10px;
 	z-index: 999;
 	opacity: 0.75;
 	color: #000;
-	font-size: 1.5rem;
+	font-size: 1.2rem;
 }
 .rain-map-time-wrapper i {
 	margin-right: 6px;
+}
+
+.rain-map-timeslider {
+	width: 0;
+	height: 0;
+	margin-top: -8px;
+	margin-left: -2px;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 10px solid #000;
+	position: relative;
+	display: block;
+}
+
+.rain-map-timeline {
+	display: block;
+	height: 4px;
+	margin-bottom: 5px;
+}
+
+.rain-map-time.rain-map-history {
+	color: var(--color-history);
+}
+
+.rain-map-time.rain-map-now {
+	color: var(--color-now);
+}
+
+.rain-map-time.rain-map-forecast {
+	color: var(--color-forecast);
 }
