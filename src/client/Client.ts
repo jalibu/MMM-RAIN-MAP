@@ -342,6 +342,10 @@ Module.register("MMM-RAIN-MAP", {
 			try {
 				for (const curr of this.config.substitudeModules) {
 					const substituteModule = MM.getModules().find((module) => module.name === curr);
+					if(!substituteModule){
+						console.warn(`No substitute module found with name ${curr}`)
+						continue
+					}
 					if (show) {
 						substituteModule.show(300);
 					} else {
