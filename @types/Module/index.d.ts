@@ -20,6 +20,7 @@ declare module Module {
 			play?: Function;
 			tick?: Function;
 			handleCurrentWeatherCondition?: Function;
+			changeSubstitureModuleVisibility?: Function;
 		}
 	): void;
 }
@@ -39,6 +40,7 @@ type Config = {
 	mapUrl: string;
 	mapHeight: string;
 	mapWidth: string;
+	substitudeModules: string[];
 	timeFormat: any;
 	updateIntervalInSeconds: number;
 };
@@ -71,3 +73,4 @@ type RuntimeData = {
 
 declare const moment: Function;
 declare const config: any;
+declare const MM: any;
