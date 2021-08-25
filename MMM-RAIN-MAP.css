@@ -9,7 +9,7 @@
 	z-index: 999;
 	opacity: 0.75;
 	color: #000;
-	font-size: 1.5rem;
+	font-size: 1.2rem;
 }
 .rain-map-time-wrapper i {
 	margin-right: 6px;
@@ -18,7 +18,7 @@
 .rain-map-timeslider {
 	width: 0;
 	height: 0;
-	margin-top: -5px;
+	margin-top: -8px;
 	margin-left: -2px;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
