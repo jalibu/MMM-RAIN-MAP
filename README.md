@@ -11,6 +11,9 @@ If you like this module and want to thank, please buy me a beer.
 ## Features
 
 - Displays Rainviewer.com radar layers on OpenStreetMap
+  * Every 10 minutes a new weather snapshot is published
+  * The snapshots of the last 2 hours are available, which show the weather events of the past
+  * Additionally 3 layers are displayed as forecast of the next 30 minutes
 - Option to place multiple markers on map  
 - Option for multiple, alternating map positions
 - Option to only show in current rainy weather conditions. Works only together with [weather](https://github.com/MichMich/MagicMirror/tree/master/modules/default/weather) or [MMM-OpenWeatherForecast](https://github.com/jclarke0000/MMM-OpenWeatherForecast) as dependency.
