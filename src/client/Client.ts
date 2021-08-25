@@ -10,6 +10,7 @@ Module.register("MMM-RAIN-MAP", {
 		displayTime: true,
 		displayTimeline: true,
 		displayOnlyOnRain: false,
+		substitudeModules: [],
 		extraDelayLastFrameMs: 2000,
 		extraDelayCurrentFrameMs: 2000,
 		markers: [
@@ -298,6 +299,8 @@ Module.register("MMM-RAIN-MAP", {
 			} else if (notificationIdentifier === "CURRENTWEATHER_TYPE") {
 				const currentCondition = payload.type;
 				this.handleCurrentWeatherCondition(currentCondition);
+			} else if (notificationIdentifier === "DOM_OBJECTS_CREATED") {
+				this.changeSubstitureModuleVisibility(false);
 			}
 		}
 	},
@@ -320,6 +323,7 @@ Module.register("MMM-RAIN-MAP", {
 		];
 		if (currentCondition && rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
 			if (!this.runtimeData.animationTimer) {
+				this.changeSubstitureModuleVisibility(false);
 				this.show(300, { lockString: this.identifier });
 				this.play();
 			}
@@ -328,6 +332,24 @@ Module.register("MMM-RAIN-MAP", {
 				this.hide(300, { lockString: this.identifier });
 				clearTimeout(this.runtimeData.animationTimer);
 				this.runtimeData.animationTimer = null;
+				this.changeSubstitureModuleVisibility(true);
+			}
+		}
+	},
+
+	changeSubstitureModuleVisibility(show: boolean) {
+		if (this.config.substitudeModules) {
+			try {
+				for (const curr of this.config.substitudeModules) {
+					const substituteModule = MM.getModules().find((module) => module.name === curr);
+					if (show) {
+						substituteModule.show(300);
+					} else {
+						substituteModule.hide(300);
+					}
+				}
+			} catch (err) {
+				console.error(err);
 			}
 		}
 	},

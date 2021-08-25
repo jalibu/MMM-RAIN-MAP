@@ -59,6 +59,7 @@ If you like this module and want to thank, please buy me a beer.
 			mapUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 			mapHeight: "420px",
 			mapWidth: "420px",
+			substitudeModules: [],
 			updateIntervalInSeconds: 300,
 		}
 	}
@@ -70,7 +71,7 @@ If you like this module and want to thank, please buy me a beer.
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `animationSpeedMs`      | Determines how fast the frames are played. <br><br>**Type:** `int` <br> **Default value:** `400` (time per frame in milliseconds)                                                                          |
 | `colorizeTime`    | Set true, to colorize history and forecast timestamps. <br><br>**Type:** `boolean` <br> **Default value:** `true`              |
-| `defaultZoomLevel`      | Fallback/default zoom value that is used if it is not explicitly set in a MapPostion. <br><br>**Type:** `int`<br>**Range:** `0 (hole world) - 20 (small building)`<br> **Default value:** `8`  |
+| `defaultZoomLevel`      | Fallback/default zoom value that is used if it is not explicitly set in a MapPostion. <br><br>**Type:** `int`<br>**Range:** `0 (whole world) - 20 (small building)`<br> **Default value:** `8`  |
 | `displayTime`           | Set true, to display the time for each frame. <br><br>**Type:** `boolean` <br> **Default value:** `true`         |
 | `displayClockSymbol`    | Set true, to display a clock symbol as time prefix. <br><br>**Type:** `boolean` <br> **Default value:** `true`              |
 | `displayTimeline`    | Set true, to display a timeline. <br><br>**Type:** `boolean` <br> **Default value:** `true`              |
@@ -82,6 +83,7 @@ If you like this module and want to thank, please buy me a beer.
 | `mapHeight`             | Height of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                   |
 | `mapWidth`              | Width of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                    |
 | `mapUrl`        | Option to use an alternative map. In most cases you are fine with the default but you can find more maps [here](https://wiki.openstreetmap.org/wiki/Tile_servers).<br><br>**Type:** `string`<br> **Default value:** `'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'`<br>**Alternative uncolored map:** '`https://tiles.wmflabs.org/bw-mapnik/${z}/${x}/${y}.png`' |
+| `substitudeModules`            | (Experimental) If `displayOnlyOnRain` is turned on, you can define a list of module names that are hidden in favor of the map. <br><br>**Type:** `array[string]` <br> **Default value:** `[]` <br> **Example:** `['MMM-Jast', 'calendar']`       |
 | `timeFormat`            | Option to override the Magic Mirror's global time format to 12 or 24 for this module. <br><br>**Type:** `int` <br> **Default value:** `[Global Config]` or `24`                                        |
 | `updateIntervalMs`      | Update interval for fetching new radar frames from the RainViewer.com API. (New frames are released every 10 minutes) <br><br>**Type:** `int` <br> **Default value:** `300000` (time in milliseconds)                                |
 
@@ -99,7 +101,7 @@ If you like this module and want to thank, please buy me a beer.
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `lat`    | **Required:** Position's latitude.<br><br>**Type:** `float` |
 | `lng`    | **Required:** Position's longitude.<br><br>**Type:** `float` |
-| `zoom`  | Either set a zoom level or defaultZoomLevel is used.<br><br>**Range:** `0 (hole world) - 20 (small building)`<br>**Type:** `number` |
+| `zoom`  | Either set a zoom level or defaultZoomLevel is used.<br><br>**Range:** `0 (whole world) - 20 (small building)`<br>**Type:** `number` |
 | `loops`  | Number of loops/iterations until the map moves to the next position. If no number is set, a value of `1` is used.<br><br>**Type:** `number` |
 
 ## Thanks to
