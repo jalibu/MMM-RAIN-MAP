@@ -40,6 +40,8 @@ type Config = {
 	mapUrl: string;
 	mapHeight: string;
 	mapWidth: string;
+	maxHistoryFrames: number;
+	maxForecastFrames: number;
 	substitudeModules: string[];
 	timeFormat: any;
 	updateIntervalInSeconds: number;
