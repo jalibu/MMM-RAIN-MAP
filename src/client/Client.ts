@@ -214,17 +214,11 @@ Module.register("MMM-RAIN-MAP", {
 
 			if (this.config.colorizeTime) {
 				if (nextAnimationPosition < this.runtimeData.numHistoryFrames - 1) {
-					this.runtimeData.timeDiv.classList.remove("rain-map-forecast");
-					this.runtimeData.timeDiv.classList.remove("rain-map-now");
-					this.runtimeData.timeDiv.classList.add("rain-map-history");
+					this.runtimeData.timeDiv.classList = "rain-map-time rain-map-history";
 				} else if (nextAnimationPosition === this.runtimeData.numHistoryFrames - 1) {
-					this.runtimeData.timeDiv.classList.remove("rain-map-forecast");
-					this.runtimeData.timeDiv.classList.add("rain-map-now");
-					this.runtimeData.timeDiv.classList.remove("rain-map-history");
+					this.runtimeData.timeDiv.classList = "rain-map-time rain-map-now";
 				} else {
-					this.runtimeData.timeDiv.classList.add("rain-map-forecast");
-					this.runtimeData.timeDiv.classList.remove("rain-map-now");
-					this.runtimeData.timeDiv.classList.remove("rain-map-history");
+					this.runtimeData.timeDiv.classList = "rain-map-time rain-map-forecast";
 				}
 			}
 
@@ -240,20 +234,9 @@ Module.register("MMM-RAIN-MAP", {
 		fetch("https://api.rainviewer.com/public/weather-maps.json").then(async (response) => {
 			if (response.ok) {
 				const results = await response.json();
-				let historyFrames = results.radar?.past || [];
-				let forecastFrames = results.radar?.nowcast || [];
-				if (self.config.maxHistoryFrames >= 0 && historyFrames.length >= self.config.maxHistoryFrames) {
-					try {
-						historyFrames = historyFrames.slice(historyFrames.length - self.config.maxHistoryFrames);
-					} catch (err) {}
-				}
 
-				if (self.config.maxForecastFrames >= 0 && forecastFrames.length >= self.config.maxForecastFrames) {
-					try {
-						forecastFrames = forecastFrames.slice(forecastFrames.length - self.config.maxForecastFrames);
-					} catch (err) {}
-				}
-
+				// Sanitite and filter new frames
+				const { historyFrames, forecastFrames } = Utils.sanitizeAndFilterFrames(results, self.config);
 				self.runtimeData.numHistoryFrames = historyFrames.length;
 				self.runtimeData.numForecastFrames = forecastFrames.length;
 				self.runtimeData.timeframes = [...historyFrames, ...forecastFrames];
@@ -316,30 +299,15 @@ Module.register("MMM-RAIN-MAP", {
 				const currentCondition = payload.type;
 				this.handleCurrentWeatherCondition(currentCondition);
 			} else if (notificationIdentifier === "DOM_OBJECTS_CREATED") {
-				this.changeSubstitureModuleVisibility(false);
+				Utils.changeSubstituteModuleVisibility(false, this.config);
 			}
 		}
 	},
 
 	handleCurrentWeatherCondition(currentCondition: string) {
-		const rainConditions = [
-			"09d",
-			"09n",
-			"10d",
-			"10n",
-			"11d",
-			"11n",
-			"13d",
-			"13n",
-			"showers",
-			"thunderstorm",
-			"sleet",
-			"rain",
-			"snow",
-		];
-		if (currentCondition && rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
+		if (currentCondition && Utils.rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
 			if (!this.runtimeData.animationTimer) {
-				this.changeSubstitureModuleVisibility(false);
+				Utils.changeSubstituteModuleVisibility(false, this.config);
 				this.show(300, { lockString: this.identifier });
 				this.play();
 			}
@@ -348,28 +316,7 @@ Module.register("MMM-RAIN-MAP", {
 				this.hide(300, { lockString: this.identifier });
 				clearTimeout(this.runtimeData.animationTimer);
 				this.runtimeData.animationTimer = null;
-				this.changeSubstitureModuleVisibility(true);
-			}
-		}
-	},
-
-	changeSubstitureModuleVisibility(show: boolean) {
-		if (this.config.substitudeModules) {
-			try {
-				for (const curr of this.config.substitudeModules) {
-					const substituteModule = MM.getModules().find((module) => module.name === curr);
-					if (!substituteModule) {
-						console.warn(`No substitute module found with name ${curr}`);
-						continue;
-					}
-					if (show) {
-						substituteModule.show(300);
-					} else {
-						substituteModule.hide(300);
-					}
-				}
-			} catch (err) {
-				console.error(err);
+				Utils.changeSubstituteModuleVisibility(true, this.config);
 			}
 		}
 	},
