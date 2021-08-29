@@ -27,6 +27,8 @@ Module.register("MMM-RAIN-MAP", {
 		mapUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 		mapHeight: "420px",
 		mapWidth: "420px",
+		maxHistoryFrames: -1,
+		maxForecastFrames: -1,
 		timeFormat: config.timeFormat || 24,
 		updateIntervalInSeconds: 300,
 	},
@@ -238,9 +240,23 @@ Module.register("MMM-RAIN-MAP", {
 		fetch("https://api.rainviewer.com/public/weather-maps.json").then(async (response) => {
 			if (response.ok) {
 				const results = await response.json();
-				self.runtimeData.numHistoryFrames = results.radar?.past?.length || 0;
-				self.runtimeData.numForecastFrames = results.radar?.nowcast?.length || 0;
-				self.runtimeData.timeframes = [...results.radar.past, ...results.radar.nowcast];
+				let historyFrames = results.radar?.past || [];
+				let forecastFrames = results.radar?.nowcast || [];
+				if (self.config.maxHistoryFrames >= 0 && historyFrames.length >= self.config.maxHistoryFrames) {
+					try {
+						historyFrames = historyFrames.slice(historyFrames.length - self.config.maxHistoryFrames);
+					} catch (err) {}
+				}
+
+				if (self.config.maxForecastFrames >= 0 && forecastFrames.length >= self.config.maxForecastFrames) {
+					try {
+						forecastFrames = forecastFrames.slice(forecastFrames.length - self.config.maxForecastFrames);
+					} catch (err) {}
+				}
+
+				self.runtimeData.numHistoryFrames = historyFrames.length;
+				self.runtimeData.numForecastFrames = forecastFrames.length;
+				self.runtimeData.timeframes = [...historyFrames, ...forecastFrames];
 
 				// Clear old radar layers
 				self.runtimeData.map.eachLayer((layer) => {
@@ -342,9 +358,9 @@ Module.register("MMM-RAIN-MAP", {
 			try {
 				for (const curr of this.config.substitudeModules) {
 					const substituteModule = MM.getModules().find((module) => module.name === curr);
-					if(!substituteModule){
-						console.warn(`No substitute module found with name ${curr}`)
-						continue
+					if (!substituteModule) {
+						console.warn(`No substitute module found with name ${curr}`);
+						continue;
 					}
 					if (show) {
 						substituteModule.show(300);
