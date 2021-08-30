@@ -36,7 +36,7 @@ body:
     attributes:
       label: Module Version
       description: |
-        What's the module's version / Commit ID? You can get this information by executing `git log` within the module's directory. Please provide the first row of the result, e.g. commit f8ae15ffb6b5e4f5d5f9cc436f8e697d02737982 (tag: v.2.0.2)
+        What's the module's version / Commit ID? You can get this information by executing `git log` within the module's directory.
       placeholder: 'v.2.0.2 or f8ae15ffb6b5e4f5d5f9cc436f8e697d02737982'
     validations:
       required: true
