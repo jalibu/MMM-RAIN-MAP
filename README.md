@@ -58,8 +58,8 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
 				{ lat: 49.15, lng: 6.154, zoom: 5, loops: 2 },
 			],
 			mapUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-			mapHeight: "420px",
-			mapWidth: "420px",
+			mapHeight: "420px", // must be a pixel value (no percent)
+			mapWidth: "420px", // must be a pixel value (no percent)
 			maxHistoryFrames: -1,
 			maxForecastFrames: -1,
 			substitudeModules: [],
@@ -83,8 +83,8 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
 | `extraDelayCurrentFrameMs` | Add an extra delay to pause the animation on the frame for the current weather situation.<br><br>**Type:** `int` <br> **Default value:** `3000` (time in milliseconds)    |
 | `markers`               | Optional list of markers on the map.<br> See examples and Markers-Object documentation below for details. <br><br>**Type:** `array[Marker]` <br> **Default value:** `Sample set`           |
 | `mapPositions`         | **Required:** List of zoom/center positions for the map.<br> See examples and MapPosition-Object documentation below for details. <br><br>**Type:** `array[MapPosition]` <br> **Default value:** `Sample set`           |
-| `mapHeight`             | Height of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                   |
-| `mapWidth`              | Width of the map. <br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                    |
+| `mapHeight`             | Height of the map. Must be string with pixels and "px" postfix. Percentage values won't work.<br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                   |
+| `mapWidth`              | Width of the map. Must be a string with pixels and "px" postfix. Percentage values won't work.<br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                    |
 | `mapUrl`        | Option to use an alternative map. In most cases you are fine with the default but you can find more maps [here](https://wiki.openstreetmap.org/wiki/Tile_servers).<br><br>**Type:** `string`<br> **Default value:** `'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'`<br>**Alternative uncolored map:** '`https://tiles.wmflabs.org/bw-mapnik/${z}/${x}/${y}.png`' |
 | `maxHistoryFrames`             | Maximum number of history frames. There is one frame every 10 minutes. Setting this to 6 would show history radar layers of the last hour until now. If set to -1, all available history frames are shown.<br>As of today, the **API provides 12 history frames** -> 2h.<br><br>**Type:** `int` <br> **Default value:** `-1`                                                                                                                   |
 | `maxForecastFrames`             | Maximum number of forecast frames. There is one frame every 10 minutes. Setting this to 2 would show forecast radar layers from now to 20 minutes in the future. If set to -1, all available forecast frames are shown.<br>As of today, the **API provides 3 forecast frames** -> 30min.<br><br>**Type:** `int` <br> **Default value:** `-1` 
