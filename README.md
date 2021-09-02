@@ -1,3 +1,4 @@
+[![dependencies Status](https://status.david-dm.org/gh/jalibu/MMM-RAIN-MAP.svg)](https://david-dm.org/jalibu/MMM-RAIN-MAP)  [![Known Vulnerabilities](https://snyk.io/test/github/jalibu/MMM-RAIN-MAP/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jalibu/MMM-RAIN-MAP?targetFile=package.json) 
 # MMM-RAIN-MAP
 
 A Rain Radar Map based on the [Rainviewer API](https://www.rainviewer.com/) for the [MagicMirror²](https://magicmirror.builders/) platform.
