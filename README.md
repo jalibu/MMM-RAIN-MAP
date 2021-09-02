@@ -1,6 +1,6 @@
 # MMM-RAIN-MAP
 
-A Rain Radar Map based on the [Rainviewer API](https://www.rainviewer.com/) for the [MagicMirror² platform](https://magicmirror.builders/).
+A Rain Radar Map based on the [Rainviewer API](https://www.rainviewer.com/) for the [MagicMirror²](https://magicmirror.builders/) platform.
  
 Click here for the [Forum Thread](https://forum.magicmirror.builders/topic/12808/mmm-rain-map).
 
