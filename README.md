@@ -24,7 +24,7 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
 
 ## Installing the Module
 
-1. Navigate to the MagicMirror subfolder "modules" and execute the following command
+1. Navigate to the MagicMirror's subfolder "modules" and execute the following command
 
 	```sh
 	git clone https://github.com/jalibu/MMM-RAIN-MAP.git
@@ -108,6 +108,14 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
 | `lng`    | **Required:** Position's longitude.<br><br>**Type:** `float` |
 | `zoom`  | Either set a zoom level or defaultZoomLevel is used.<br><br>**Range:** `0 (whole world) - 20 (small building)`<br>**Type:** `number` |
 | `loops`  | Number of loops/iterations until the map moves to the next position. If no number is set, a value of `1` is used.<br><br>**Type:** `number` |
+
+
+## Contribution and Development
+This module is written in TypeScript and compiled with Rollup.  
+The source files are located in the `/src` folder.
+Compile target files with `npm run build`.
+
+Contribution for this module is welcome!
 
 ## Thanks to
 
