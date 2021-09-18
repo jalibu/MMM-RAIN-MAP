@@ -1,6 +1,7 @@
 export type Config = {
   animationSpeedMs: number
   colorizeTime: boolean
+  colorScheme: number
   defaultZoomLevel: number
   displayClockSymbol: boolean
   displayTime: boolean

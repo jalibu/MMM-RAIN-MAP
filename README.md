@@ -3,7 +3,7 @@
 [![version](https://img.shields.io/github/package-json/v/jalibu/MMM-RAIN-MAP)](https://github.com/jalibu/MMM-RAIN-MAP/releases) [![Known Vulnerabilities](https://snyk.io/test/github/jalibu/MMM-RAIN-MAP/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jalibu/MMM-RAIN-MAP?targetFile=package.json)
 
 A Rain Radar Map based on the [Rainviewer API](https://www.rainviewer.com/) for the [MagicMirror²](https://magicmirror.builders/) platform.  
-Click here for the [Forum Thread](https://forum.magicmirror.builders/topic/12808/mmm-rain-map).  
+Click here for the [Forum Thread](https://forum.magicmirror.builders/topic/12808/mmm-rain-map).
 
 Contribution welcome.
 
@@ -44,6 +44,7 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
    	position: "top_left",
    	config: {
    		animationSpeedMs: 400,
+   	colorScheme: 2,
    		colorizeTime: true,
    		defaultZoomLevel: 8,
    		displayTime: true,
@@ -80,6 +81,7 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `animationSpeedMs`         | Determines how fast the frames are played. <br><br>**Type:** `int` <br> **Default value:** `400` (time per frame in milliseconds)                                                                                                                                                                                                                                                    |
 | `colorizeTime`             | Set true, to colorize history and forecast timestamps. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                                                                                                                                                                    |
+| `colorScheme`              | Set the color scheme for the rain layers. Click [here](https://www.rainviewer.com/api/color-schemes.html) to find your favorite scheme.<br><br>**Type:** `number` (0 - 8) <br> **Default value:** `2` (Universal Blue)                                                                                                                                                               |
 | `defaultZoomLevel`         | Fallback/default zoom value that is used if it is not explicitly set in a MapPostion. <br><br>**Type:** `int`<br>**Range:** `0 (whole world) - 20 (small building)`<br> **Default value:** `8`                                                                                                                                                                                       |
 | `displayTime`              | Set true, to display the time for each frame. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                                                                                                                                                                             |
 | `displayClockSymbol`       | Set true, to display a clock symbol as time prefix. <br><br>**Type:** `boolean` <br> **Default value:** `true`                                                                                                                                                                                                                                                                       |

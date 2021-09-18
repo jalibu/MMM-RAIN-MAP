@@ -9,6 +9,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
   defaults: {
     animationSpeedMs: 400,
     colorizeTime: true,
+    colorScheme: 2,
     defaultZoomLevel: 8,
     displayClockSymbol: true,
     displayTime: true,
@@ -258,7 +259,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
         // Add new radar layers
         for (const timeframe of self._runtimeData.timeframes) {
           const radarLayer = new L.TileLayer(
-            'https://tilecache.rainviewer.com' + timeframe.path + '/256/{z}/{x}/{y}/2/1_1.png',
+            `https://tilecache.rainviewer.com${timeframe.path}/256/{z}/{x}/{y}/${this.config.colorScheme}/1_1.png`,
             {
               tileSize: 256,
               opacity: 0.001,
