@@ -1,3 +1,4 @@
+/* eslint-disable-next-line import/no-extraneous-dependencies */
 import * as L from 'leaflet'
 import Utils from './Utils'
 import { Config } from '../types/Config'
@@ -39,7 +40,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     updateIntervalInSeconds: 300
   },
 
-  _runtimeData: {
+  runtimeData: {
     animationPosition: 0,
     animationTimer: null,
     map: null,
@@ -77,20 +78,20 @@ Module.register<Config>('MMM-RAIN-MAP', {
       const timeWrapperDiv = document.createElement('div')
       timeWrapperDiv.classList.add('rain-map-time-wrapper')
       timeWrapperDiv.innerHTML = `${this.config.displayClockSymbol ? "<i class='fas fa-clock'></i>" : ''}`
-      this._runtimeData.timeDiv = document.createElement('span')
-      this._runtimeData.timeDiv.classList.add('rain-map-time')
-      timeWrapperDiv.appendChild(this._runtimeData.timeDiv)
+      this.runtimeData.timeDiv = document.createElement('span')
+      this.runtimeData.timeDiv.classList.add('rain-map-time')
+      timeWrapperDiv.appendChild(this.runtimeData.timeDiv)
 
       if (this.config.displayTimeline) {
         const timelineWrapper = document.createElement('span')
         timelineWrapper.classList.add('rain-map-timeline-wrapper')
 
-        this._runtimeData.sliderDiv = document.createElement('span')
-        this._runtimeData.sliderDiv.classList.add('rain-map-timeslider')
-        timelineWrapper.appendChild(this._runtimeData.sliderDiv)
-        this._runtimeData.timelineDiv = document.createElement('span')
-        this._runtimeData.timelineDiv.classList.add('rain-map-timeline')
-        timelineWrapper.appendChild(this._runtimeData.timelineDiv)
+        this.runtimeData.sliderDiv = document.createElement('span')
+        this.runtimeData.sliderDiv.classList.add('rain-map-timeslider')
+        timelineWrapper.appendChild(this.runtimeData.sliderDiv)
+        this.runtimeData.timelineDiv = document.createElement('span')
+        this.runtimeData.timelineDiv.classList.add('rain-map-timeline')
+        timelineWrapper.appendChild(this.runtimeData.timelineDiv)
 
         timeWrapperDiv.appendChild(timelineWrapper)
       }
@@ -109,14 +110,14 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
     const firstPosition = this.config.mapPositions[0]
 
-    this._runtimeData.map = L.map(mapDiv, {
+    this.runtimeData.map = L.map(mapDiv, {
       zoomControl: false,
       trackResize: false,
       attributionControl: false
     }).setView([firstPosition.lat, firstPosition.lng], firstPosition.zoom)
 
     // Sanitize map URL
-    L.tileLayer(this.config.mapUrl.split('$').join('')).addTo(this._runtimeData.map)
+    L.tileLayer(this.config.mapUrl.split('$').join('')).addTo(this.runtimeData.map)
 
     for (const marker of this.config.markers) {
       L.marker([marker.lat, marker.lng], {
@@ -126,7 +127,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
           iconSize: [25, 41],
           shadowSize: [41, 41]
         })
-      }).addTo(this._runtimeData.map)
+      }).addTo(this.runtimeData.map)
     }
 
     // Once the map is initialized, we can remove the app-wrapper from the body and return it to the getDom() function
@@ -141,49 +142,47 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   scheduleUpdate() {
-    const self = this
     this.loadData()
     setInterval(() => {
-      self.loadData()
+      this.loadData()
     }, this.config.updateIntervalInSeconds * 1000)
   },
 
   play() {
-    const self = this
     let extraDelay = 0
-    if (self._runtimeData.animationPosition === self._runtimeData.timeframes.length - 1) {
+    if (this.runtimeData.animationPosition === this.runtimeData.timeframes.length - 1) {
       extraDelay = this.config.extraDelayLastFrameMs
-    } else if (self._runtimeData.animationPosition === this._runtimeData.numHistoryFrames - 1) {
+    } else if (this.runtimeData.animationPosition === this.runtimeData.numHistoryFrames - 1) {
       extraDelay = this.config.extraDelayCurrentFrameMs
     }
 
-    this._runtimeData.animationTimer = setTimeout(() => {
-      self.tick()
-      self.play()
+    this.runtimeData.animationTimer = setTimeout(() => {
+      this.tick()
+      this.play()
     }, this.config.animationSpeedMs + extraDelay)
   },
 
   tick() {
-    if (!this._runtimeData.map || this._runtimeData.timeframes.length === 0) {
+    if (!this.runtimeData.map || this.runtimeData.timeframes.length === 0) {
       return
     }
 
     const nextAnimationPosition =
-      this._runtimeData.animationPosition < this._runtimeData.timeframes.length - 1
-        ? this._runtimeData.animationPosition + 1
+      this.runtimeData.animationPosition < this.runtimeData.timeframes.length - 1
+        ? this.runtimeData.animationPosition + 1
         : 0
 
     // Manage map positions
     if (nextAnimationPosition === 0 && this.config.mapPositions.length > 1) {
-      const currentMapPosition = this.config.mapPositions[this._runtimeData.mapPosition]
+      const currentMapPosition = this.config.mapPositions[this.runtimeData.mapPosition]
 
-      if (this._runtimeData.loopNumber === (currentMapPosition.loops || 1)) {
-        this._runtimeData.loopNumber = 1
+      if (this.runtimeData.loopNumber === (currentMapPosition.loops || 1)) {
+        this.runtimeData.loopNumber = 1
         const nextMapPosition =
-          this._runtimeData.mapPosition === this.config.mapPositions.length - 1 ? 0 : this._runtimeData.mapPosition + 1
-        this._runtimeData.mapPosition = nextMapPosition
+          this.runtimeData.mapPosition === this.config.mapPositions.length - 1 ? 0 : this.runtimeData.mapPosition + 1
+        this.runtimeData.mapPosition = nextMapPosition
         const nextPosition = this.config.mapPositions[nextMapPosition]
-        this._runtimeData.map.setView(
+        this.runtimeData.map.setView(
           new L.LatLng(nextPosition.lat, nextPosition.lng),
           nextPosition.zoom || this.config.defaultZoomLevel,
           {
@@ -191,16 +190,16 @@ Module.register<Config>('MMM-RAIN-MAP', {
           }
         )
       } else {
-        this._runtimeData.loopNumber++
+        this.runtimeData.loopNumber += 1
       }
     }
 
     // Manage radar layers
-    const currentTimeframe = this._runtimeData.timeframes[this._runtimeData.animationPosition]
-    const currentRadarLayer = this._runtimeData.radarLayers[currentTimeframe.time]
+    const currentTimeframe = this.runtimeData.timeframes[this.runtimeData.animationPosition]
+    const currentRadarLayer = this.runtimeData.radarLayers[currentTimeframe.time]
 
-    const nextTimeframe = this._runtimeData.timeframes[nextAnimationPosition]
-    const nextRadarLayer = this._runtimeData.radarLayers[nextTimeframe.time]
+    const nextTimeframe = this.runtimeData.timeframes[nextAnimationPosition]
+    const nextRadarLayer = this.runtimeData.radarLayers[nextTimeframe.time]
 
     if (nextRadarLayer) {
       nextRadarLayer.setOpacity(1)
@@ -216,48 +215,48 @@ Module.register<Config>('MMM-RAIN-MAP', {
         time.tz(this.config.timezone)
       }
       const hourSymbol = this.config.timeFormat === 24 ? 'HH' : 'h'
-      this._runtimeData.timeDiv.innerHTML = `${time.format(hourSymbol + ':mm')}`
+      this.runtimeData.timeDiv.innerHTML = `${time.format(`${hourSymbol}:mm`)}`
 
       if (this.config.colorizeTime) {
-        if (nextAnimationPosition < this._runtimeData.numHistoryFrames - 1) {
-          this._runtimeData.timeDiv.classList = 'rain-map-time rain-map-history'
-        } else if (nextAnimationPosition === this._runtimeData.numHistoryFrames - 1) {
-          this._runtimeData.timeDiv.classList = 'rain-map-time rain-map-now'
+        if (nextAnimationPosition < this.runtimeData.numHistoryFrames - 1) {
+          this.runtimeData.timeDiv.classList = 'rain-map-time rain-map-history'
+        } else if (nextAnimationPosition === this.runtimeData.numHistoryFrames - 1) {
+          this.runtimeData.timeDiv.classList = 'rain-map-time rain-map-now'
         } else {
-          this._runtimeData.timeDiv.classList = 'rain-map-time rain-map-forecast'
+          this.runtimeData.timeDiv.classList = 'rain-map-time rain-map-forecast'
         }
       }
 
       if (this.config.displayTimeline) {
-        this._runtimeData.sliderDiv.style.left = `${this._runtimeData.percentPerFrame * nextAnimationPosition}%`
+        this.runtimeData.sliderDiv.style.left = `${this.runtimeData.percentPerFrame * nextAnimationPosition}%`
       }
     }
-    this._runtimeData.animationPosition = nextAnimationPosition
+    this.runtimeData.animationPosition = nextAnimationPosition
   },
 
   loadData() {
-    const self = this
     fetch('https://api.rainviewer.com/public/weather-maps.json').then(async (response) => {
       if (response.ok) {
         const results = await response.json()
 
         // Sanitite and filter new frames
-        const { historyFrames, forecastFrames } = Utils.sanitizeAndFilterFrames(results, self.config)
-        self._runtimeData.numHistoryFrames = historyFrames.length
-        self._runtimeData.numForecastFrames = forecastFrames.length
-        self._runtimeData.timeframes = [...historyFrames, ...forecastFrames]
+        const { historyFrames, forecastFrames } = Utils.sanitizeAndFilterFrames(results, this.config)
+        this.runtimeData.numHistoryFrames = historyFrames.length
+        this.runtimeData.numForecastFrames = forecastFrames.length
+        this.runtimeData.timeframes = [...historyFrames, ...forecastFrames]
 
         // Clear old radar layers
-        self._runtimeData.map.eachLayer((layer) => {
+        this.runtimeData.map.eachLayer((layer) => {
+          /* eslint-disable-next-line no-underscore-dangle */
           if (layer instanceof L.TileLayer && layer._url.includes('rainviewer.com')) {
-            self._runtimeData.map.removeLayer(layer)
+            this.runtimeData.map.removeLayer(layer)
           }
         })
 
-        self._runtimeData.radarLayers = []
+        this.runtimeData.radarLayers = []
 
         // Add new radar layers
-        for (const timeframe of self._runtimeData.timeframes) {
+        for (const timeframe of this.runtimeData.timeframes) {
           const radarLayer = new L.TileLayer(
             `https://tilecache.rainviewer.com${timeframe.path}/256/{z}/{x}/{y}/${this.config.colorScheme}/1_1.png`,
             {
@@ -266,23 +265,23 @@ Module.register<Config>('MMM-RAIN-MAP', {
               zIndex: timeframe
             }
           )
-          self._runtimeData.radarLayers[timeframe.time] = radarLayer
-          if (!self._runtimeData.map.hasLayer(radarLayer)) {
-            self._runtimeData.map.addLayer(radarLayer)
+          this.runtimeData.radarLayers[timeframe.time] = radarLayer
+          if (!this.runtimeData.map.hasLayer(radarLayer)) {
+            this.runtimeData.map.addLayer(radarLayer)
           }
         }
 
-        self._runtimeData.animationPosition = 0
+        this.runtimeData.animationPosition = 0
 
         // Prepare timeline
         if (this.config.displayTimeline) {
           try {
-            this._runtimeData.percentPerFrame =
-              100 / (self._runtimeData.numHistoryFrames + self._runtimeData.numForecastFrames)
-            const historyPart = (self._runtimeData.numHistoryFrames - 1) * this._runtimeData.percentPerFrame
-            const forecastPart = self._runtimeData.numForecastFrames * this._runtimeData.percentPerFrame
-            this._runtimeData.timelineDiv.style.background = `linear-gradient(to right, var(--color-history) 0% ${historyPart}%, var(--color-now) ${historyPart}% ${
-              historyPart + this._runtimeData.percentPerFrame
+            this.runtimeData.percentPerFrame =
+              100 / (this.runtimeData.numHistoryFrames + this.runtimeData.numForecastFrames)
+            const historyPart = (this.runtimeData.numHistoryFrames - 1) * this.runtimeData.percentPerFrame
+            const forecastPart = this.runtimeData.numForecastFrames * this.runtimeData.percentPerFrame
+            this.runtimeData.timelineDiv.style.background = `linear-gradient(to right, var(--color-history) 0% ${historyPart}%, var(--color-now) ${historyPart}% ${
+              historyPart + this.runtimeData.percentPerFrame
             }%, var(--color-forecast) ${forecastPart}%)`
           } catch (err) {
             console.warn('Error rendering the map timeline')
@@ -312,19 +311,16 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
   handleCurrentWeatherCondition(currentCondition: string) {
     if (currentCondition && Utils.rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
-      if (!this._runtimeData.animationTimer) {
+      if (!this.runtimeData.animationTimer) {
         Utils.changeSubstituteModuleVisibility(false, this.config)
-        this.show(300, ()=>{}, { lockString: this.identifier })
+        this.show(300, () => {}, { lockString: this.identifier })
         this.play()
       }
-    } else {
-      if (this._runtimeData.animationTimer) {
-        console.log("hide with", { lockString: this.identifier })
-        this.hide(300, ()=>{}, { lockString: this.identifier })
-        clearTimeout(this._runtimeData.animationTimer)
-        this._runtimeData.animationTimer = null
-        Utils.changeSubstituteModuleVisibility(true, this.config)
-      }
+    } else if (this.runtimeData.animationTimer) {
+      this.hide(300, () => {}, { lockString: this.identifier })
+      clearTimeout(this.runtimeData.animationTimer)
+      this.runtimeData.animationTimer = null
+      Utils.changeSubstituteModuleVisibility(true, this.config)
     }
   }
 })

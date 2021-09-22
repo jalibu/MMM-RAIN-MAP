@@ -54,6 +54,7 @@ export default class RainMapUtils {
           const substituteModule = MM.getModules().find((module) => module.name === curr)
           if (!substituteModule) {
             console.warn(`No substitute module found with name ${curr}`)
+
             continue
           }
           if (show) {

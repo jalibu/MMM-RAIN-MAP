@@ -22,7 +22,7 @@ const bannerText = `/*! ********************************************************
 `;
 export default [
 	{
-		input: "./src/client/Client.ts",
+		input: "./src/frontend/Frontend.ts",
 		plugins: [typescript({ module: "ESNext" }), nodeResolve(), commonjs(), terser(), banner2(() => bannerText)],
 		output: {
 			file: "./" + pkg.main,
