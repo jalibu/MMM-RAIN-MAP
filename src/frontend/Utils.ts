@@ -1,6 +1,8 @@
+import * as Log from 'logger'
 import { Config } from '../types/Config'
 
 // Global or injected variable declarations
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const MM: any
 
 export default class RainMapUtils {
@@ -32,7 +34,7 @@ export default class RainMapUtils {
       try {
         historyFrames = historyFrames.slice(historyFrames.length - config.maxHistoryFrames)
       } catch (err) {
-        console.warn('Error to limit history frames', err)
+        Log.warn('Error to limit history frames', err)
       }
     }
 
@@ -40,7 +42,7 @@ export default class RainMapUtils {
       try {
         forecastFrames = forecastFrames.slice(forecastFrames.length - config.maxForecastFrames)
       } catch (err) {
-        console.warn('Error to limit forecast frames', err)
+        Log.warn('Error to limit forecast frames', err)
       }
     }
 
@@ -53,7 +55,7 @@ export default class RainMapUtils {
         for (const curr of config.substitudeModules) {
           const substituteModule = MM.getModules().find((module) => module.name === curr)
           if (!substituteModule) {
-            console.warn(`No substitute module found with name ${curr}`)
+            Log.warn(`No substitute module found with name ${curr}`)
 
             continue
           }
@@ -64,7 +66,7 @@ export default class RainMapUtils {
           }
         }
       } catch (err) {
-        console.error(err)
+        Log.error(err)
       }
     }
   }
