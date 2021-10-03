@@ -1,9 +1,11 @@
 /* eslint-disable-next-line import/no-extraneous-dependencies */
 import * as L from 'leaflet'
+import * as Log from 'logger'
 import Utils from './Utils'
 import { Config } from '../types/Config'
 
 // Global or injected variable declarations
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const moment: any
 
 Module.register<Config>('MMM-RAIN-MAP', {
@@ -284,13 +286,13 @@ Module.register<Config>('MMM-RAIN-MAP', {
               historyPart + this.runtimeData.percentPerFrame
             }%, var(--color-forecast) ${forecastPart}%)`
           } catch (err) {
-            console.warn('Error rendering the map timeline')
+            Log.warn('Error rendering the map timeline')
           }
         }
 
-        console.debug('Done processing latest RainViewer API request.')
+        Log.log('Done processing latest RainViewer API request.')
       } else {
-        console.error('Error fetching RainViewer timeframes', response.statusText)
+        Log.error('Error fetching RainViewer timeframes', response.statusText)
       }
     })
   },

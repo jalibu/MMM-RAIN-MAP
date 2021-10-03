@@ -1,10 +1,10 @@
-import banner2 from "rollup-plugin-banner2";
-import commonjs from "@rollup/plugin-commonjs";
-import nodeResolve from "@rollup/plugin-node-resolve";
-import typescript from "@rollup/plugin-typescript";
-import { terser } from "rollup-plugin-terser";
+import banner2 from 'rollup-plugin-banner2'
+import commonjs from '@rollup/plugin-commonjs'
+import nodeResolve from '@rollup/plugin-node-resolve'
+import typescript from '@rollup/plugin-typescript'
+import { terser } from 'rollup-plugin-terser'
 
-const pkg = require("./package.json");
+const pkg = require('./package.json')
 
 const bannerText = `/*! *****************************************************************************
   ${pkg.name}
@@ -19,14 +19,18 @@ const bannerText = `/*! ********************************************************
   This file is auto-generated. Do not edit.
 ***************************************************************************** */
 
-`;
+`
 export default [
-	{
-		input: "./src/frontend/Frontend.ts",
-		plugins: [typescript({ module: "ESNext" }), nodeResolve(), commonjs(), terser(), banner2(() => bannerText)],
-		output: {
-			file: "./" + pkg.main,
-			format: "iife",
-		},
-	},
-];
+  {
+    input: './src/frontend/Frontend.ts',
+    external: ['logger'],
+    plugins: [typescript({ module: 'ESNext' }), nodeResolve(), commonjs(), terser(), banner2(() => bannerText)],
+    output: {
+      file: './' + pkg.main,
+      format: 'iife',
+      globals: {
+        logger: 'Log'
+      }
+    }
+  }
+]
