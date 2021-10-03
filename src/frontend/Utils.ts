@@ -60,9 +60,9 @@ export default class RainMapUtils {
             continue
           }
           if (show) {
-            substituteModule.show(300)
+            substituteModule.show(300, () => {}, { lockString: 'MMM-RAIN-MAP' })
           } else {
-            substituteModule.hide(300)
+            substituteModule.hide(300, () => {}, { lockString: 'MMM-RAIN-MAP' })
           }
         }
       } catch (err) {
