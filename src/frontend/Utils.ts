@@ -1,5 +1,5 @@
 import * as Log from 'logger'
-import { Config } from '../types/Config'
+import { Config, Marker } from '../types/Config'
 
 // Global or injected variable declarations
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,11 +23,14 @@ export default class RainMapUtils {
     'snow'
   ]
 
-  static getIconColor(marker) {
+  static getIconColor(marker: Marker): string {
     return marker.color && RainMapUtils.supportedIconColors.includes(marker.color) ? marker.color : 'red'
   }
 
-  static sanitizeAndFilterFrames(results, config) {
+  static sanitizeAndFilterFrames(
+    results: { radar: { past: string[]; nowcast: string[] } },
+    config: Config
+  ): { historyFrames: string[]; forecastFrames: string[] } {
     let historyFrames = results.radar?.past || []
     let forecastFrames = results.radar?.nowcast || []
     if (config.maxHistoryFrames >= 0 && historyFrames.length >= config.maxHistoryFrames) {
@@ -49,7 +52,7 @@ export default class RainMapUtils {
     return { historyFrames, forecastFrames }
   }
 
-  static changeSubstituteModuleVisibility(show: boolean, config: Config) {
+  static changeSubstituteModuleVisibility(show: boolean, config: Config): void {
     if (config.substitudeModules) {
       try {
         for (const curr of config.substitudeModules) {

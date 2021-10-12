@@ -22,6 +22,6 @@ export type Config = {
   updateIntervalInSeconds: number
 }
 
-type Marker = { lat: number; lng: number; color?: string }
+export type Marker = { lat: number; lng: number; color?: string }
 
 type MapPosition = { lat: number; lng: number; zoom: number; loops?: number }
