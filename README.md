@@ -44,7 +44,7 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
    	position: "top_left",
    	config: {
    		animationSpeedMs: 400,
-   	colorScheme: 2,
+   		colorScheme: 2,
    		colorizeTime: true,
    		defaultZoomLevel: 8,
    		displayTime: true,
@@ -64,7 +64,7 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
    			{ lat: 48.856, lng: 2.35, zoom: 9, loops: 2 },
    			{ lat: 49.15, lng: 6.154, zoom: 5, loops: 2 },
    		],
-   		mapUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+   		mapUrl: "https://a.tile.openstreetmap.de/{z}/{x}/{y}.png",
    		mapHeight: "420px", // must be a pixel value (no percent)
    		mapWidth: "420px", // must be a pixel value (no percent)
    		maxHistoryFrames: -1,
@@ -93,7 +93,7 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
 | `mapPositions`             | **Required:** List of zoom/center positions for the map.<br> See examples and MapPosition-Object documentation below for details. <br><br>**Type:** `array[MapPosition]` <br> **Default value:** `Sample set`                                                                                                                                                                        |
 | `mapHeight`                | Height of the map. Must be string with pixels and "px" postfix. Percentage values won't work.<br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                                                                                                                   |
 | `mapWidth`                 | Width of the map. Must be a string with pixels and "px" postfix. Percentage values won't work.<br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                                                                                                                  |
-| `mapUrl`                   | Option to use an alternative map. In most cases you are fine with the default but you can find more maps [here](https://wiki.openstreetmap.org/wiki/Tile_servers).<br><br>**Type:** `string`<br> **Default value:** `'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'`<br>**Alternative uncolored map:** '`https://tiles.wmflabs.org/bw-mapnik/${z}/${x}/${y}.png`'              |
+| `mapUrl`                   | Option to use an alternative map. In most cases you are fine with the default but you can find more maps [here](https://wiki.openstreetmap.org/wiki/Tile_servers).<br><br>**Type:** `string`<br> **Default value:** `'https://a.tile.openstreetmap.de/{z}/{x}/{y}.png'`<br>**Alternative uncolored map:** '`https://tiles.wmflabs.org/bw-mapnik/${z}/${x}/${y}.png`'              |
 | `maxHistoryFrames`         | Maximum number of history frames. There is one frame every 10 minutes. Setting this to 6 would show history radar layers of the last hour until now. If set to -1, all available history frames are shown.<br>As of today, the **API provides 12 history frames** -> 2h.<br><br>**Type:** `int` <br> **Default value:** `-1`                                                         |
 | `maxForecastFrames`        | Maximum number of forecast frames. There is one frame every 10 minutes. Setting this to 2 would show forecast radar layers from now to 20 minutes in the future. If set to -1, all available forecast frames are shown.<br>As of today, the **API provides 3 forecast frames** -> 30min.<br><br>**Type:** `int` <br> **Default value:** `-1`                                         |
 | `substitudeModules`        | (Experimental) If `displayOnlyOnRain` is turned on, you can define a list of module names that are hidden in favor of the map. <br><br>**Type:** `array[string]` <br> **Default value:** `[]` <br> **Example:** `['MMM-Jast', 'calendar']`                                                                                                                                           |
