@@ -330,8 +330,8 @@ Module.register<Config>('MMM-RAIN-MAP', {
         }
       }
     }
-    Log.log('Next rain will be in %.1f hours.', closestRain/1000/60/60);
-    if (closestRain < this.config.displayHoursBeforeRain*60*60*1000) { // Rain within the next hour
+    Log.log('Next rain will be in %.1f hours.', closestRain/1000/60/60)
+    if (closestRain < this.config.displayHoursBeforeRain*60*60*1000) {
       this.handleCurrentWeatherCondition('rain')
     } else {
       this.handleCurrentWeatherCondition('')
