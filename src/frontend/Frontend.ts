@@ -321,27 +321,20 @@ Module.register<Config>('MMM-RAIN-MAP', {
   handleWeatherUpdate(update: any) {
     Log.log('Weather update!')
     const hourlyData = update.hourlyArray
-    var closestRain = Infinity;
-    const now = Date.now();
+    var closestRain = Infinity
+    const now = Date.now()
     for (let entry of hourlyData) {
       if (Utils.rainConditions.findIndex((condition) => entry.weatherType.includes(condition)) >= 0) {
         if (entry.date-now < closestRain) {
-          closestRain = entry.date-now;
+          closestRain = entry.date-now
         }
       }
     }
     Log.log('Next rain will be in %.1f hours.', closestRain/1000/60/60);
     if (closestRain < this.config.displayHoursBeforeRain*60*60*1000) { // Rain within the next hour
-      if (!this.runtimeData.animationTimer) {
-        Utils.changeSubstituteModuleVisibility(false, this.config)
-        this.show(300, () => {}, { lockString: this.identifier })
-        this.play()
-      }
-    } else if (this.runtimeData.animationTimer) {
-      this.hide(300, () => {}, { lockString: this.identifier })
-      clearTimeout(this.runtimeData.animationTimer)
-      this.runtimeData.animationTimer = null
-      Utils.changeSubstituteModuleVisibility(true, this.config)
+      this.handleCurrentWeatherCondition('rain')
+    } else {
+      this.handleCurrentWeatherCondition('')
     }
   }, 
 
