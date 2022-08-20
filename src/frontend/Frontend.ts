@@ -326,12 +326,13 @@ Module.register<Config>('MMM-RAIN-MAP', {
     for (let entry of hourlyData) {
       if (Utils.rainConditions.findIndex((condition) => entry.weatherType.includes(condition)) >= 0) {
         if (entry.date-now < closestRain) {
-          closestRain = entry.date-now
+          closestRain = (entry.date-now)
         }
       }
     }
-    Log.log('Next rain will be in %.1f hours.', closestRain/1000/60/60)
-    if (closestRain < this.config.displayHoursBeforeRain*60*60*1000) {
+    closestRain = closestRain/1000/60/60 // convert to hours
+    Log.log('Next rain will be in %.1f hours.', closestRain)
+    if (closestRain < this.config.displayHoursBeforeRain) {
       this.handleCurrentWeatherCondition('rain')
     } else {
       this.handleCurrentWeatherCondition('')
