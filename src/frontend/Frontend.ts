@@ -17,7 +17,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     displayClockSymbol: true,
     displayTime: true,
     displayTimeline: true,
-    displayHoursBeforeRain: Infinity,
+    displayHoursBeforeRain: -1,
     substitudeModules: [],
     extraDelayLastFrameMs: 2000,
     extraDelayCurrentFrameMs: 2000,
@@ -298,7 +298,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   notificationReceived(notificationIdentifier: string, payload: any) {
-    if (this.config.displayHoursBeforeRain < Infinity) {
+    if (this.config.displayHoursBeforeRain >= 0) {
       if (notificationIdentifier === 'DOM_OBJECTS_CREATED') {
         Utils.changeSubstituteModuleVisibility(false, this.config)
       }
@@ -319,11 +319,10 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   handleWeatherUpdate(update: any) {
-    Log.log('Weather update!')
     const hourlyData = update.hourlyArray
-    var closestRain = Infinity
+    let closestRain = Infinity
     const now = Date.now()
-    for (let entry of hourlyData) {
+    for (const entry of hourlyData) {
       if (Utils.rainConditions.findIndex((condition) => entry.weatherType.includes(condition)) >= 0) {
         if (entry.date-now < closestRain) {
           closestRain = (entry.date-now)
