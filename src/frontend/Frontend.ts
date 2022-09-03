@@ -17,7 +17,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     displayClockSymbol: true,
     displayTime: true,
     displayTimeline: true,
-    displayOnlyOnRain: false,
+    displayHoursBeforeRain: -1,
     substitudeModules: [],
     extraDelayLastFrameMs: 2000,
     extraDelayCurrentFrameMs: 2000,
@@ -139,6 +139,9 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   start() {
+    if (this.config.displayOnlyOnRain) {
+      Log.warn("MMM-RAIN-MAP option 'displayOnlyOnRain# is deprecated. Use 'displayHoursBeforeRain' instead.")
+    }
     this.scheduleUpdate()
     this.play()
   },
@@ -298,16 +301,43 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   notificationReceived(notificationIdentifier: string, payload: any) {
-    if (this.config.displayOnlyOnRain) {
-      if (notificationIdentifier === 'OPENWEATHER_FORECAST_WEATHER_UPDATE') {
-        const currentCondition = payload.current?.weather[0]?.icon
-        this.handleCurrentWeatherCondition(currentCondition)
-      } else if (notificationIdentifier === 'CURRENTWEATHER_TYPE') {
-        const currentCondition = payload.type
-        this.handleCurrentWeatherCondition(currentCondition)
-      } else if (notificationIdentifier === 'DOM_OBJECTS_CREATED') {
+    if (this.config.displayHoursBeforeRain >= 0) {
+      if (notificationIdentifier === 'DOM_OBJECTS_CREATED') {
         Utils.changeSubstituteModuleVisibility(false, this.config)
       }
+      if (this.config.displayHoursBeforeRain == 0) {
+        if (notificationIdentifier === 'OPENWEATHER_FORECAST_WEATHER_UPDATE') {
+          const currentCondition = payload.current?.weather[0]?.icon
+          this.handleCurrentWeatherCondition(currentCondition)
+        } else if (notificationIdentifier === 'CURRENTWEATHER_TYPE') {
+          const currentCondition = payload.type
+          this.handleCurrentWeatherCondition(currentCondition)
+        }
+      } else if (this.config.displayHoursBeforeRain > 0) {
+        if (notificationIdentifier === 'WEATHER_UPDATED') {
+          this.handleWeatherUpdate(payload)
+        }
+      }
+    }
+  },
+
+  handleWeatherUpdate(update: any) {
+    const hourlyData = update.hourlyArray
+    let closestRain = Infinity
+    const now = Date.now()
+    for (const entry of hourlyData) {
+      if (Utils.rainConditions.findIndex((condition) => entry.weatherType.includes(condition)) >= 0) {
+        if (entry.date - now < closestRain) {
+          closestRain = entry.date - now
+        }
+      }
+    }
+    closestRain = closestRain / 1000 / 60 / 60 // convert to hours
+    Log.log('Next rain will be in %.1f hours.', closestRain)
+    if (closestRain < this.config.displayHoursBeforeRain) {
+      this.handleCurrentWeatherCondition('rain')
+    } else {
+      this.handleCurrentWeatherCondition('')
     }
   },
 
