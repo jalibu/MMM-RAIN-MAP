@@ -139,6 +139,9 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   start() {
+    if (this.config.displayOnlyOnRain) {
+      Log.warn("MMM-RAIN-MAP option 'displayOnlyOnRain# is deprecated. Use 'displayHoursBeforeRain' instead.")
+    }
     this.scheduleUpdate()
     this.play()
   },
@@ -324,19 +327,19 @@ Module.register<Config>('MMM-RAIN-MAP', {
     const now = Date.now()
     for (const entry of hourlyData) {
       if (Utils.rainConditions.findIndex((condition) => entry.weatherType.includes(condition)) >= 0) {
-        if (entry.date-now < closestRain) {
-          closestRain = (entry.date-now)
+        if (entry.date - now < closestRain) {
+          closestRain = entry.date - now
         }
       }
     }
-    closestRain = closestRain/1000/60/60 // convert to hours
+    closestRain = closestRain / 1000 / 60 / 60 // convert to hours
     Log.log('Next rain will be in %.1f hours.', closestRain)
     if (closestRain < this.config.displayHoursBeforeRain) {
       this.handleCurrentWeatherCondition('rain')
     } else {
       this.handleCurrentWeatherCondition('')
     }
-  }, 
+  },
 
   handleCurrentWeatherCondition(currentCondition: string) {
     if (currentCondition && Utils.rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
