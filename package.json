@@ -23,7 +23,9 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c --sourcemap=inline",
-    "dev:watch": "npm run dev -- --watch"
+    "dev:watch": "npm run dev -- --watch",
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint --fix . && prettier --write ."
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^20.0.0",
