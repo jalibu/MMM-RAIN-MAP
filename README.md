@@ -2,12 +2,13 @@
 
 [![version](https://img.shields.io/github/package-json/v/jalibu/MMM-RAIN-MAP)](https://github.com/jalibu/MMM-RAIN-MAP/releases) [![Known Vulnerabilities](https://snyk.io/test/github/jalibu/MMM-RAIN-MAP/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jalibu/MMM-RAIN-MAP?targetFile=package.json)
 
-A Rain Radar Map based on the [Rainviewer API](https://www.rainviewer.com/) for the [MagicMirror²](https://magicmirror.builders/) platform.  
+A Rain Radar Map based on the [Rainviewer API](https://www.rainviewer.com/) for the [MagicMirror²](https://magicmirror.builders/) platform.
+
 Click here for the [Forum Thread](https://forum.magicmirror.builders/topic/12808/mmm-rain-map).
 
 Contribution welcome.
 
-#### Support
+## Support
 
 If you also like this module and want to thank, please rate this repository with a star or [donate a small amount that is worth it to you](https://paypal.me/jalibu).
 
@@ -24,7 +25,7 @@ If you also like this module and want to thank, please rate this repository with
 
 ### Demo
 
-https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-b057-e01dc9ef71d7.mov
+<https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-b057-e01dc9ef71d7.mov>
 
 ## Installing the Module
 
@@ -38,38 +39,38 @@ https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-
 
    ```javascript
    {
-   	module: "MMM-RAIN-MAP",
-   	position: "top_left",
-   	config: {
-   		animationSpeedMs: 400,
-   		colorScheme: 2,
-   		colorizeTime: true,
-   		defaultZoomLevel: 8,
-   		displayTime: true,
-   		displayTimeline: true,
-   		displayClockSymbol: true,
-   		displayHoursBeforeRain: -1,
-   		extraDelayLastFrameMs: 1000,
-   		extraDelayCurrentFrameMs: 3000,
-   		markers: [
-   			{ lat: 49.41, lng: 8.717, color: "red" },
-   			{ lat: 48.856, lng: 2.35, color: "green" },
-   		],
-   		mapPositions: [
-   			{ lat: 49.41, lng: 8.717, zoom: 9, loops: 1 },
-   			{ lat: 49.41, lng: 8.717, zoom: 6, loops: 2 },
-   			{ lat: 48.856, lng: 2.35, zoom: 6, loops: 1 },
-   			{ lat: 48.856, lng: 2.35, zoom: 9, loops: 2 },
-   			{ lat: 49.15, lng: 6.154, zoom: 5, loops: 2 },
-   		],
-   		mapUrl: "https://a.tile.openstreetmap.de/{z}/{x}/{y}.png",
-   		mapHeight: "420px", // must be a pixel value (no percent)
-   		mapWidth: "420px", // must be a pixel value (no percent)
-   		maxHistoryFrames: -1,
-   		maxForecastFrames: -1,
-   		substitudeModules: [],
-   		updateIntervalInSeconds: 300,
-   	}
+    module: "MMM-RAIN-MAP",
+    position: "top_left",
+    config: {
+     animationSpeedMs: 400,
+     colorScheme: 2,
+     colorizeTime: true,
+     defaultZoomLevel: 8,
+     displayTime: true,
+     displayTimeline: true,
+     displayClockSymbol: true,
+     displayHoursBeforeRain: -1,
+     extraDelayLastFrameMs: 1000,
+     extraDelayCurrentFrameMs: 3000,
+     markers: [
+      { lat: 49.41, lng: 8.717, color: "red" },
+      { lat: 48.856, lng: 2.35, color: "green" },
+     ],
+     mapPositions: [
+      { lat: 49.41, lng: 8.717, zoom: 9, loops: 1 },
+      { lat: 49.41, lng: 8.717, zoom: 6, loops: 2 },
+      { lat: 48.856, lng: 2.35, zoom: 6, loops: 1 },
+      { lat: 48.856, lng: 2.35, zoom: 9, loops: 2 },
+      { lat: 49.15, lng: 6.154, zoom: 5, loops: 2 },
+     ],
+     mapUrl: "https://a.tile.openstreetmap.de/{z}/{x}/{y}.png",
+     mapHeight: "420px", // must be a pixel value (no percent)
+     mapWidth: "420px", // must be a pixel value (no percent)
+     maxHistoryFrames: -1,
+     maxForecastFrames: -1,
+     substitudeModules: [],
+     updateIntervalInSeconds: 300,
+    }
    }
    ```
 
