@@ -7,6 +7,13 @@
     "type": "git",
     "url": "git+https://github.com/jalibu/MMM-RAIN-MAP.git"
   },
+  "keywords": [
+    "magicmirror",
+    "weather",
+    "rain",
+    "leaflet",
+    "map"
+  ],
   "author": "Jan.Litzenburger@gmail.com",
   "license": "MIT",
   "bugs": {
