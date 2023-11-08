@@ -32,6 +32,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
       { lat: 48.856, lng: 2.35, zoom: 9, loops: 2 },
       { lat: 49.15, lng: 6.154, zoom: 5, loops: 2 }
     ],
+    // eslint-disable-next-line no-template-curly-in-string
     mapUrl: 'https://a.tile.openstreetmap.de/${z}/${x}/${y}.png',
     mapHeight: '420px',
     mapWidth: '420px',
@@ -305,7 +306,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
       if (notificationIdentifier === 'DOM_OBJECTS_CREATED') {
         Utils.changeSubstituteModuleVisibility(false, this.config)
       }
-      if (this.config.displayHoursBeforeRain == 0) {
+      if (this.config.displayHoursBeforeRain === 0) {
         if (notificationIdentifier === 'OPENWEATHER_FORECAST_WEATHER_UPDATE') {
           const currentCondition = payload.current?.weather[0]?.icon
           this.handleCurrentWeatherCondition(currentCondition)

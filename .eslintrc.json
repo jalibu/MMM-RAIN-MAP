@@ -1,7 +1,7 @@
 {
   "root": true,
   "extends": ["airbnb-typescript-prettier"],
-  "ignorePatterns": ["*.js"],
+  "ignorePatterns": ["MMM-RAIN-MAP.js"],
   "rules": {
     "newline-before-return": "warn",
     "no-restricted-syntax": "off",

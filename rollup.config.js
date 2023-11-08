@@ -4,6 +4,7 @@ import nodeResolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import { terser } from 'rollup-plugin-terser'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('./package.json')
 
 const bannerText = `/*! *****************************************************************************
@@ -26,7 +27,7 @@ export default [
     external: ['logger'],
     plugins: [typescript({ module: 'ESNext' }), nodeResolve(), commonjs(), terser(), banner2(() => bannerText)],
     output: {
-      file: './' + pkg.main,
+      file: `./${pkg.main}`,
       format: 'iife',
       globals: {
         logger: 'Log'
