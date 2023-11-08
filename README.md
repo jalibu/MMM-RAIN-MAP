@@ -27,12 +27,12 @@ If you also like this module and want to thank, please rate this repository with
 
 <https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-b057-e01dc9ef71d7.mov>
 
-## Installing the Module
+## Installing the module
 
 1. Navigate to the `MagicMirror/modules` directory and execute the following command
 
    ```sh
-   git clone https://github.com/jalibu/MMM-RAIN-MAP.git
+   git clone https://github.com/jalibu/MMM-RAIN-MAP
    ```
 
 2. Add the module configuration into the `MagicMirror/config/config.js` file (sample configuration):
