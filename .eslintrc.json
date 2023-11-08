@@ -3,13 +3,9 @@
   "extends": ["airbnb-typescript-prettier"],
   "ignorePatterns": ["MMM-RAIN-MAP.js"],
   "rules": {
-    "newline-before-return": "warn",
-    "no-restricted-syntax": "off",
     "import/no-unresolved": "off",
-    "no-await-in-loop": "warn",
-    "lines-between-class-members": "off",
-    "class-methods-use-this": "warn",
+    "no-continue": "warn",
     "@typescript-eslint/no-empty-function": "warn",
-    "no-continue": "warn"
+    "no-restricted-syntax": "off"
   }
 }
