@@ -7,6 +7,7 @@ declare const MM: any
 
 export default class RainMapUtils {
   static supportedIconColors = ['black', 'blue', 'gold', 'green', 'grey', 'orange', 'red', 'violet', 'yellow']
+
   static rainConditions = [
     '09d',
     '09n',

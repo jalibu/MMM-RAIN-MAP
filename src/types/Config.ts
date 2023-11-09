@@ -6,7 +6,7 @@ export type Config = {
   displayClockSymbol: boolean
   displayTime: boolean
   displayTimeline: boolean
-  displayOnlyOnRain?: boolean,
+  displayOnlyOnRain?: boolean
   displayHoursBeforeRain: number
   substitudeModules: string[]
   extraDelayLastFrameMs: number
