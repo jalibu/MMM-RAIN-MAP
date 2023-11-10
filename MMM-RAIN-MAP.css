@@ -44,3 +44,7 @@
 .rain-map-time.rain-map-forecast {
   color: var(--color-forecast);
 }
+
+.leaflet-container {
+  background-color: transparent !important;
+}
