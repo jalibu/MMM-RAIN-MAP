@@ -18,6 +18,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     displayTime: true,
     displayTimeline: true,
     displayHoursBeforeRain: -1,
+    invertColors: false,
     substitudeModules: [],
     extraDelayLastFrameMs: 2000,
     extraDelayCurrentFrameMs: 2000,
@@ -75,6 +76,9 @@ Module.register<Config>('MMM-RAIN-MAP', {
     // Create app-wrapper
     const app = document.createElement('div')
     app.classList.add('rain-map-wrapper')
+    if (this.config.invertColors) {
+      app.classList.add('inverted-colors')
+    }
 
     // Create time-wrapper
     if (this.config.displayTime) {

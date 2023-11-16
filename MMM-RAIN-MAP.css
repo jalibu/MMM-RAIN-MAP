@@ -50,3 +50,7 @@
 .leaflet-container {
   background-color: transparent !important;
 }
+
+.rain-map-wrapper.inverted-colors .leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(180deg);
+}

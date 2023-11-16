@@ -11,6 +11,7 @@ export type Config = {
   substitudeModules: string[]
   extraDelayLastFrameMs: number
   extraDelayCurrentFrameMs: number
+  invertColors: boolean
   markers: Marker[]
   mapPositions: MapPosition[]
   mapUrl: string
