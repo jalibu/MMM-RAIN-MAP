@@ -1,4 +1,4 @@
-export type Config = {
+export interface Config {
   animationSpeedMs: number
   colorizeTime: boolean
   colorScheme: number
@@ -24,6 +24,15 @@ export type Config = {
   updateIntervalInSeconds: number
 }
 
-export type Marker = { lat: number; lng: number; color?: string }
+export interface Marker {
+  lat: number
+  lng: number
+  color?: string
+}
 
-type MapPosition = { lat: number; lng: number; zoom: number; loops?: number }
+interface MapPosition {
+  lat: number
+  lng: number
+  zoom: number
+  loops?: number
+}
