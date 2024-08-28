@@ -1,4 +1,3 @@
-/* eslint-disable-next-line import/no-extraneous-dependencies */
 import * as L from 'leaflet'
 import * as Log from 'logger'
 import Utils from './Utils'
@@ -33,7 +32,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
       { lat: 48.856, lng: 2.35, zoom: 9, loops: 2 },
       { lat: 49.15, lng: 6.154, zoom: 5, loops: 2 }
     ],
-    // eslint-disable-next-line no-template-curly-in-string
+
     mapUrl: 'https://a.tile.openstreetmap.de/${z}/${x}/${y}.png',
     mapHeight: '420px',
     mapWidth: '420px',
@@ -257,7 +256,6 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
         // Clear old radar layers
         this.runtimeData.map.eachLayer((layer) => {
-          /* eslint-disable-next-line no-underscore-dangle */
           if (layer instanceof L.TileLayer && layer._url.includes('rainviewer.com')) {
             this.runtimeData.map.removeLayer(layer)
           }
@@ -294,7 +292,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
               historyPart + this.runtimeData.percentPerFrame
             }%, var(--color-forecast) ${forecastPart}%)`
           } catch (err) {
-            Log.warn('Error rendering the map timeline')
+            Log.warn('Error rendering the map timeline: ' + err)
           }
         }
 
@@ -305,6 +303,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     })
   },
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   notificationReceived(notificationIdentifier: string, payload: any) {
     if (this.config.displayHoursBeforeRain >= 0) {
       if (notificationIdentifier === 'DOM_OBJECTS_CREATED') {
@@ -326,6 +325,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     }
   },
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   handleWeatherUpdate(update: any) {
     const hourlyData = update.hourlyArray
     let closestRain = Infinity
