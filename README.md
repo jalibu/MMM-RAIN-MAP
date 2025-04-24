@@ -72,7 +72,7 @@ If you also like this module and want to thank, please rate this repository with
      substitudeModules: [],
      updateIntervalInSeconds: 300,
     }
-   }
+   },
    ```
 
 ### Options
@@ -100,6 +100,15 @@ If you also like this module and want to thank, please rate this repository with
 | `substitudeModules`        | (Experimental) If `displayOnlyOnRain` is turned on, you can define a list of module names that are hidden in favor of the map. <br><br>**Type:** `array[string]` <br> **Default value:** `[]` <br> **Example:** `['MMM-Jast', 'calendar']`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `timeFormat`               | Option to override the MagicMirror's global time format to 12 or 24 for this module. <br><br>**Type:** `int` <br> **Default value:** `[Global Config]` or `24`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `updateIntervalMs`         | Update interval for fetching new radar frames from the RainViewer.com API. (New frames are released every 10 minutes) <br><br>**Type:** `int` <br> **Default value:** `300000` (time in milliseconds)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+
+## Update the module
+
+Just enter the module's directory, pull the update and install the dependencies:
+
+```bash
+cd ~/MagicMirror/modules/MMM-RAIN-MAP
+git pull
+```
 
 ### Marker Object
 
