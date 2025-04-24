@@ -26,8 +26,8 @@
     "build": "rollup -c",
     "dev": "rollup -c --sourcemap=inline",
     "dev:watch": "npm run dev -- --watch",
-    "lint": "eslint . --ignore-pattern '*.js' && prettier --check .",
-    "lint:fix": "eslint --fix . --ignore-pattern '*.js' && prettier --write ."
+    "lint": "eslint && prettier . --check",
+    "lint:fix": "eslint --fix && prettier . --write"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",
