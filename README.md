@@ -23,9 +23,9 @@ If you also like this module and want to thank, please rate this repository with
 - Option to only show in current rainy weather conditions. Works only together with [weather](https://github.com/MagicMirrorOrg/MagicMirror/tree/master/modules/default/weather) or [MMM-OpenWeatherForecast](https://github.com/jclarke0000/MMM-OpenWeatherForecast) as dependency.
 - (Experimental) Option to hide other modules in case of rain in favor to get more space.
 
-### Demo
+### Demos
 
-<https://user-images.githubusercontent.com/25933231/130909536-e096d342-19d5-4139-b057-e01dc9ef71d7.mov>
+<img src="./docs/screencast1.gif" width="33%"> <img src="./docs/screencast2.gif" width="33%">
 
 ## Installation
 
