@@ -64,13 +64,6 @@ Module.register<Config>('MMM-RAIN-MAP', {
     return ['moment.js', 'moment-timezone.js']
   },
 
-  getTranslations() {
-    return {
-      en: 'translations/en.json',
-      de: 'translations/de.json'
-    }
-  },
-
   getDom() {
     // Create app-wrapper
     const app = document.createElement('div')
