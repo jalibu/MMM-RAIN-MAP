@@ -130,9 +130,6 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   start() {
-    if (this.config.displayOnlyOnRain) {
-      Log.warn("MMM-RAIN-MAP option 'displayOnlyOnRain# is deprecated. Use 'displayHoursBeforeRain' instead.")
-    }
     this.scheduleUpdate()
     this.play()
   },
