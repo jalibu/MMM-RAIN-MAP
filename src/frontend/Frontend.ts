@@ -4,8 +4,6 @@ import { changeSubstituteModuleVisibility, getIconColor, rainConditions, sanitiz
 import { Config } from '../types/Config'
 
 // Global or injected variable declarations
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const moment: any
 
 Module.register<Config>('MMM-RAIN-MAP', {
   defaults: {
@@ -58,10 +56,6 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
   getStyles() {
     return ['font-awesome.css', 'leaflet.css', 'MMM-RAIN-MAP.css']
-  },
-
-  getScripts() {
-    return ['moment.js', 'moment-timezone.js']
   },
 
   getDom() {
@@ -212,12 +206,14 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
     // Manage time
     if (this.config.displayTime) {
-      const time = moment(nextTimeframe.time * 1000)
-      if (this.config.timezone) {
-        time.tz(this.config.timezone)
-      }
-      const hourSymbol = this.config.timeFormat === 24 ? 'HH' : 'h'
-      this.runtimeData.timeDiv.innerHTML = `${time.format(`${hourSymbol}:mm`)}`
+      const date = new Date(nextTimeframe.time * 1000)
+      const timeString = date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: this.config.timeFormat !== 24,
+        timeZone: this.config.timezone || undefined
+      })
+      this.runtimeData.timeDiv.innerHTML = timeString
 
       if (this.config.colorizeTime) {
         if (nextAnimationPosition < this.runtimeData.numHistoryFrames - 1) {
