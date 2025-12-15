@@ -34,20 +34,13 @@ export default class RainMapUtils {
   ): { historyFrames: string[]; forecastFrames: string[] } {
     let historyFrames = results.radar?.past || []
     let forecastFrames = results.radar?.nowcast || []
+
     if (config.maxHistoryFrames >= 0 && historyFrames.length >= config.maxHistoryFrames) {
-      try {
-        historyFrames = historyFrames.slice(historyFrames.length - config.maxHistoryFrames)
-      } catch (err) {
-        Log.warn('Error to limit history frames', err)
-      }
+      historyFrames = historyFrames.slice(-config.maxHistoryFrames)
     }
 
     if (config.maxForecastFrames >= 0 && forecastFrames.length >= config.maxForecastFrames) {
-      try {
-        forecastFrames = forecastFrames.slice(forecastFrames.length - config.maxForecastFrames)
-      } catch (err) {
-        Log.warn('Error to limit forecast frames', err)
-      }
+      forecastFrames = forecastFrames.slice(-config.maxForecastFrames)
     }
 
     return { historyFrames, forecastFrames }
