@@ -324,7 +324,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     let closestRain = Infinity
     const now = Date.now()
     for (const entry of hourlyData) {
-      if (Utils.rainConditions.findIndex((condition) => entry.weatherType.includes(condition)) >= 0) {
+      if (Utils.rainConditions.some((condition) => entry.weatherType.includes(condition))) {
         if (entry.date - now < closestRain) {
           closestRain = entry.date - now
         }
@@ -340,7 +340,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   handleCurrentWeatherCondition(currentCondition: string) {
-    if (currentCondition && Utils.rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
+    if (currentCondition && Utils.rainConditions.some((condition) => currentCondition.includes(condition))) {
       if (!this.runtimeData.animationTimer) {
         Utils.changeSubstituteModuleVisibility(false, this.config)
         this.show(300, undefined, { lockString: this.identifier })
