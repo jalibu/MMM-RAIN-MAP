@@ -50,7 +50,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
    * @property {number} numHistoryFrames - Number of past radar frames
    * @property {number} numForecastFrames - Number of future radar frames
    * @property {number} loopNumber - Current loop count for position cycling
-   * @property {L.TileLayer[]} radarLayers - Radar tile layers indexed by timestamp
+   * @property {Map<number, L.TileLayer>|null} radarLayers - Radar tile layers keyed by timestamp
    * @property {HTMLSpanElement|null} timeDiv - Time display element
    * @property {HTMLSpanElement} [sliderDiv] - Timeline slider element
    * @property {HTMLSpanElement} [timelineDiv] - Timeline background element
@@ -65,7 +65,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     numHistoryFrames: 0,
     numForecastFrames: 0,
     loopNumber: 1,
-    radarLayers: [],
+    radarLayers: null,
     timeDiv: null,
     timeframes: []
   },
@@ -146,6 +146,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   start() {
+    this.runtimeData.radarLayers = new Map()
     this.scheduleUpdate()
     this.play()
   },
@@ -205,10 +206,10 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
     // Manage radar layers
     const currentTimeframe = this.runtimeData.timeframes[this.runtimeData.animationPosition]
-    const currentRadarLayer = this.runtimeData.radarLayers[currentTimeframe.time]
+    const currentRadarLayer = this.runtimeData.radarLayers.get(currentTimeframe.time)
 
     const nextTimeframe = this.runtimeData.timeframes[nextAnimationPosition]
-    const nextRadarLayer = this.runtimeData.radarLayers[nextTimeframe.time]
+    const nextRadarLayer = this.runtimeData.radarLayers.get(nextTimeframe.time)
 
     if (nextRadarLayer) {
       nextRadarLayer.setOpacity(1)
@@ -269,7 +270,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
         }
       })
 
-      this.runtimeData.radarLayers = []
+      this.runtimeData.radarLayers.clear()
 
       // Add new radar layers
       for (const timeframe of this.runtimeData.timeframes) {
@@ -281,7 +282,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
             zIndex: timeframe
           }
         )
-        this.runtimeData.radarLayers[timeframe.time] = radarLayer
+        this.runtimeData.radarLayers.set(timeframe.time, radarLayer)
         if (!this.runtimeData.map.hasLayer(radarLayer)) {
           this.runtimeData.map.addLayer(radarLayer)
         }
