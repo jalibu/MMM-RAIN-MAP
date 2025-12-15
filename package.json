@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/jalibu/MMM-RAIN-MAP#readme",
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && cp node_modules/leaflet/dist/leaflet.css leaflet.css",
     "dev": "rollup -c --sourcemap=inline",
     "dev:watch": "npm run dev -- --watch",
     "lint": "eslint && prettier . --check",
