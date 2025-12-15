@@ -45,6 +45,8 @@ Module.register<Config>('MMM-RAIN-MAP', {
    * Runtime state for the rain map animation.
    * @property {number} animationPosition - Current frame index in animation
    * @property {number|null} animationTimer - setTimeout ID for animation loop
+   * @property {number|null} updateInterval - setInterval ID for data updates
+   * @property {AbortController|null} abortController - Controller to cancel pending fetches
    * @property {L.Map|null} map - Leaflet map instance
    * @property {number} mapPosition - Current index in mapPositions array
    * @property {number} numHistoryFrames - Number of past radar frames
@@ -60,6 +62,8 @@ Module.register<Config>('MMM-RAIN-MAP', {
   runtimeData: {
     animationPosition: 0,
     animationTimer: null,
+    updateInterval: null,
+    abortController: null,
     map: null,
     mapPosition: 0,
     numHistoryFrames: 0,
@@ -153,7 +157,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
   scheduleUpdate() {
     this.loadData()
-    setInterval(() => {
+    this.runtimeData.updateInterval = setInterval(() => {
       this.loadData()
     }, this.config.updateIntervalInSeconds * 1000)
   },
@@ -247,8 +251,14 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   async loadData() {
+    // Abort any pending fetch
+    this.runtimeData.abortController?.abort()
+    this.runtimeData.abortController = new AbortController()
+
     try {
-      const response = await fetch('https://api.rainviewer.com/public/weather-maps.json')
+      const response = await fetch('https://api.rainviewer.com/public/weather-maps.json', {
+        signal: this.runtimeData.abortController.signal
+      })
 
       if (!response.ok) {
         Log.error('Error fetching RainViewer timeframes', response.statusText)
@@ -303,8 +313,33 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
       Log.log('Done processing latest RainViewer API request.')
     } catch (err) {
+      // Ignore abort errors (expected when suspend() is called)
+      if (err instanceof Error && err.name === 'AbortError') {
+        return
+      }
       Log.error('Error fetching RainViewer data', err)
     }
+  },
+
+  suspend() {
+    // Clear animation timer
+    if (this.runtimeData.animationTimer) {
+      clearTimeout(this.runtimeData.animationTimer)
+      this.runtimeData.animationTimer = null
+    }
+    // Clear update interval
+    if (this.runtimeData.updateInterval) {
+      clearInterval(this.runtimeData.updateInterval)
+      this.runtimeData.updateInterval = null
+    }
+    // Abort pending fetch
+    this.runtimeData.abortController?.abort()
+  },
+
+  resume() {
+    // Restart update cycle and animation
+    this.scheduleUpdate()
+    this.play()
   },
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
