@@ -33,7 +33,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
       { lat: 49.15, lng: 6.154, zoom: 5, loops: 2 }
     ],
 
-    mapUrl: 'https://a.tile.openstreetmap.de/${z}/${x}/${y}.png',
+    mapUrl: 'https://a.tile.openstreetmap.de/{z}/{x}/{y}.png',
     mapHeight: '420px',
     mapWidth: '420px',
     maxHistoryFrames: -1,
