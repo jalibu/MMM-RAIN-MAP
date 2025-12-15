@@ -12,7 +12,6 @@ export default defineConfig(
   },
   {
     rules: {
-      '@typescript-eslint/no-empty-function': 'warn',
       '@typescript-eslint/no-extraneous-class': 'off'
     }
   }

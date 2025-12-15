@@ -343,11 +343,11 @@ Module.register<Config>('MMM-RAIN-MAP', {
     if (currentCondition && Utils.rainConditions.findIndex((condition) => currentCondition.includes(condition)) >= 0) {
       if (!this.runtimeData.animationTimer) {
         Utils.changeSubstituteModuleVisibility(false, this.config)
-        this.show(300, () => {}, { lockString: this.identifier })
+        this.show(300, undefined, { lockString: this.identifier })
         this.play()
       }
     } else if (this.runtimeData.animationTimer) {
-      this.hide(300, () => {}, { lockString: this.identifier })
+      this.hide(300, undefined, { lockString: this.identifier })
       clearTimeout(this.runtimeData.animationTimer)
       this.runtimeData.animationTimer = null
       Utils.changeSubstituteModuleVisibility(true, this.config)

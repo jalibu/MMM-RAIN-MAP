@@ -64,9 +64,9 @@ export default class RainMapUtils {
             continue
           }
           if (show) {
-            substituteModule.show(300, () => {}, { lockString: 'MMM-RAIN-MAP' })
+            substituteModule.show(300, undefined, { lockString: 'MMM-RAIN-MAP' })
           } else {
-            substituteModule.hide(300, () => {}, { lockString: 'MMM-RAIN-MAP' })
+            substituteModule.hide(300, undefined, { lockString: 'MMM-RAIN-MAP' })
           }
         }
       } catch (err) {
