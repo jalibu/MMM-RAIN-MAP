@@ -236,64 +236,65 @@ Module.register<Config>('MMM-RAIN-MAP', {
     this.runtimeData.animationPosition = nextAnimationPosition
   },
 
-  loadData() {
-    fetch('https://api.rainviewer.com/public/weather-maps.json').then(async (response) => {
-      if (response.ok) {
-        const results = await response.json()
+  async loadData() {
+    try {
+      const response = await fetch('https://api.rainviewer.com/public/weather-maps.json')
 
-        // Sanitite and filter new frames
-        const { historyFrames, forecastFrames } = Utils.sanitizeAndFilterFrames(results, this.config)
-        this.runtimeData.numHistoryFrames = historyFrames.length
-        this.runtimeData.numForecastFrames = forecastFrames.length
-        this.runtimeData.timeframes = [...historyFrames, ...forecastFrames]
-
-        // Clear old radar layers
-        this.runtimeData.map.eachLayer((layer) => {
-          if (layer instanceof L.TileLayer && layer._url.includes('rainviewer.com')) {
-            this.runtimeData.map.removeLayer(layer)
-          }
-        })
-
-        this.runtimeData.radarLayers = []
-
-        // Add new radar layers
-        for (const timeframe of this.runtimeData.timeframes) {
-          const radarLayer = new L.TileLayer(
-            `https://tilecache.rainviewer.com${timeframe.path}/256/{z}/{x}/{y}/${this.config.colorScheme}/1_1.png`,
-            {
-              tileSize: 256,
-              opacity: 0.001,
-              zIndex: timeframe
-            }
-          )
-          this.runtimeData.radarLayers[timeframe.time] = radarLayer
-          if (!this.runtimeData.map.hasLayer(radarLayer)) {
-            this.runtimeData.map.addLayer(radarLayer)
-          }
-        }
-
-        this.runtimeData.animationPosition = 0
-
-        // Prepare timeline
-        if (this.config.displayTimeline) {
-          try {
-            this.runtimeData.percentPerFrame =
-              100 / (this.runtimeData.numHistoryFrames + this.runtimeData.numForecastFrames)
-            const historyPart = (this.runtimeData.numHistoryFrames - 1) * this.runtimeData.percentPerFrame
-            const forecastPart = this.runtimeData.numForecastFrames * this.runtimeData.percentPerFrame
-            this.runtimeData.timelineDiv.style.background = `linear-gradient(to right, var(--color-history) 0% ${historyPart}%, var(--color-now) ${historyPart}% ${
-              historyPart + this.runtimeData.percentPerFrame
-            }%, var(--color-forecast) ${forecastPart}%)`
-          } catch (err) {
-            Log.warn('Error rendering the map timeline: ' + err)
-          }
-        }
-
-        Log.log('Done processing latest RainViewer API request.')
-      } else {
+      if (!response.ok) {
         Log.error('Error fetching RainViewer timeframes', response.statusText)
+        return
       }
-    })
+
+      const results = await response.json()
+
+      // Sanitize and filter new frames
+      const { historyFrames, forecastFrames } = Utils.sanitizeAndFilterFrames(results, this.config)
+      this.runtimeData.numHistoryFrames = historyFrames.length
+      this.runtimeData.numForecastFrames = forecastFrames.length
+      this.runtimeData.timeframes = [...historyFrames, ...forecastFrames]
+
+      // Clear old radar layers
+      this.runtimeData.map.eachLayer((layer) => {
+        if (layer instanceof L.TileLayer && layer._url.includes('rainviewer.com')) {
+          this.runtimeData.map.removeLayer(layer)
+        }
+      })
+
+      this.runtimeData.radarLayers = []
+
+      // Add new radar layers
+      for (const timeframe of this.runtimeData.timeframes) {
+        const radarLayer = new L.TileLayer(
+          `https://tilecache.rainviewer.com${timeframe.path}/256/{z}/{x}/{y}/${this.config.colorScheme}/1_1.png`,
+          {
+            tileSize: 256,
+            opacity: 0.001,
+            zIndex: timeframe
+          }
+        )
+        this.runtimeData.radarLayers[timeframe.time] = radarLayer
+        if (!this.runtimeData.map.hasLayer(radarLayer)) {
+          this.runtimeData.map.addLayer(radarLayer)
+        }
+      }
+
+      this.runtimeData.animationPosition = 0
+
+      // Prepare timeline
+      if (this.config.displayTimeline) {
+        this.runtimeData.percentPerFrame =
+          100 / (this.runtimeData.numHistoryFrames + this.runtimeData.numForecastFrames)
+        const historyPart = (this.runtimeData.numHistoryFrames - 1) * this.runtimeData.percentPerFrame
+        const forecastPart = this.runtimeData.numForecastFrames * this.runtimeData.percentPerFrame
+        this.runtimeData.timelineDiv.style.background = `linear-gradient(to right, var(--color-history) 0% ${historyPart}%, var(--color-now) ${historyPart}% ${
+          historyPart + this.runtimeData.percentPerFrame
+        }%, var(--color-forecast) ${forecastPart}%)`
+      }
+
+      Log.log('Done processing latest RainViewer API request.')
+    } catch (err) {
+      Log.error('Error fetching RainViewer data', err)
+    }
   },
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
