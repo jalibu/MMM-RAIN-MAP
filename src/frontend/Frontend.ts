@@ -1,6 +1,6 @@
 import * as L from 'leaflet'
 import * as Log from 'logger'
-import Utils from './Utils'
+import { changeSubstituteModuleVisibility, getIconColor, rainConditions, sanitizeAndFilterFrames } from './Utils'
 import { Config } from '../types/Config'
 
 // Global or injected variable declarations
@@ -121,7 +121,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     for (const marker of this.config.markers) {
       L.marker([marker.lat, marker.lng], {
         icon: new L.Icon({
-          iconUrl: this.file(`img/marker-icon-2x-${Utils.getIconColor(marker)}.png`),
+          iconUrl: this.file(`img/marker-icon-2x-${getIconColor(marker)}.png`),
           shadowUrl: this.file(`img/marker-shadow.png`),
           iconSize: [25, 41],
           shadowSize: [41, 41]
@@ -248,7 +248,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
       const results = await response.json()
 
       // Sanitize and filter new frames
-      const { historyFrames, forecastFrames } = Utils.sanitizeAndFilterFrames(results, this.config)
+      const { historyFrames, forecastFrames } = sanitizeAndFilterFrames(results, this.config)
       this.runtimeData.numHistoryFrames = historyFrames.length
       this.runtimeData.numForecastFrames = forecastFrames.length
       this.runtimeData.timeframes = [...historyFrames, ...forecastFrames]
@@ -301,7 +301,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
   notificationReceived(notificationIdentifier: string, payload: any) {
     if (this.config.displayHoursBeforeRain >= 0) {
       if (notificationIdentifier === 'DOM_OBJECTS_CREATED') {
-        Utils.changeSubstituteModuleVisibility(false, this.config)
+        changeSubstituteModuleVisibility(false, this.config)
       }
       if (this.config.displayHoursBeforeRain === 0) {
         if (notificationIdentifier === 'OPENWEATHER_FORECAST_WEATHER_UPDATE') {
@@ -325,7 +325,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     let closestRain = Infinity
     const now = Date.now()
     for (const entry of hourlyData) {
-      if (Utils.rainConditions.some((condition) => entry.weatherType.includes(condition))) {
+      if (rainConditions.some((condition) => entry.weatherType.includes(condition))) {
         if (entry.date - now < closestRain) {
           closestRain = entry.date - now
         }
@@ -341,9 +341,9 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   handleCurrentWeatherCondition(currentCondition: string) {
-    if (currentCondition && Utils.rainConditions.some((condition) => currentCondition.includes(condition))) {
+    if (currentCondition && rainConditions.some((condition) => currentCondition.includes(condition))) {
       if (!this.runtimeData.animationTimer) {
-        Utils.changeSubstituteModuleVisibility(false, this.config)
+        changeSubstituteModuleVisibility(false, this.config)
         this.show(300, undefined, { lockString: this.identifier })
         this.play()
       }
@@ -351,7 +351,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
       this.hide(300, undefined, { lockString: this.identifier })
       clearTimeout(this.runtimeData.animationTimer)
       this.runtimeData.animationTimer = null
-      Utils.changeSubstituteModuleVisibility(true, this.config)
+      changeSubstituteModuleVisibility(true, this.config)
     }
   }
 })
