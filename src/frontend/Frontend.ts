@@ -41,6 +41,22 @@ Module.register<Config>('MMM-RAIN-MAP', {
     updateIntervalInSeconds: 300
   },
 
+  /**
+   * Runtime state for the rain map animation.
+   * @property {number} animationPosition - Current frame index in animation
+   * @property {number|null} animationTimer - setTimeout ID for animation loop
+   * @property {L.Map|null} map - Leaflet map instance
+   * @property {number} mapPosition - Current index in mapPositions array
+   * @property {number} numHistoryFrames - Number of past radar frames
+   * @property {number} numForecastFrames - Number of future radar frames
+   * @property {number} loopNumber - Current loop count for position cycling
+   * @property {L.TileLayer[]} radarLayers - Radar tile layers indexed by timestamp
+   * @property {HTMLSpanElement|null} timeDiv - Time display element
+   * @property {HTMLSpanElement} [sliderDiv] - Timeline slider element
+   * @property {HTMLSpanElement} [timelineDiv] - Timeline background element
+   * @property {Array<{time: number, path: string}>} timeframes - Radar frame data from API
+   * @property {number} [percentPerFrame] - Timeline percentage per frame
+   */
   runtimeData: {
     animationPosition: 0,
     animationTimer: null,
