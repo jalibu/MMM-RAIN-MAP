@@ -41,6 +41,6 @@
     "prettier": "^3.7.4",
     "rollup": "^4.53.4",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.49.0"
+    "typescript-eslint": "^8.51.0"
   }
 }
