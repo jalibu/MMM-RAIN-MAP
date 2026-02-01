@@ -54,7 +54,7 @@
     "leaflet": "^1.9.4",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
-    "rollup": "^4.55.1",
+    "rollup": "^4.57.1",
     "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.52.0"
