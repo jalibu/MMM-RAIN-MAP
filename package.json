@@ -54,7 +54,7 @@
     "@types/leaflet": "^1.9.21",
     "@types/magicmirror-module": "^2.16.6",
     "commit-and-tag-version": "^12.7.3",
-    "eslint": "^10.5.0",
+    "eslint": "^10.6.0",
     "leaflet": "^1.9.4",
     "lint-staged": "^17.0.7",
     "prettier": "^3.8.4",
