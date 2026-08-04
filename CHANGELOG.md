@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.1.0](https://github.com/jalibu/MMM-RAIN-MAP/compare/v3.0.5...v3.1.0) (2026-08-04)
+
+### Added
+
+* add radar layer opacity option ([162447d](https://github.com/jalibu/MMM-RAIN-MAP/commit/162447ddfd63c391c757f7c6583baa3ac842350b))
+* **provider:** add LibreWXR support ([0152df9](https://github.com/jalibu/MMM-RAIN-MAP/commit/0152df9a96a8f7614a21353c4e8d6cbc2752e958))
+
+### Chores
+
+* add allowScripts config ([163c73b](https://github.com/jalibu/MMM-RAIN-MAP/commit/163c73bf8621cff654469beb215fb9995fe34370))
+* update devDependencies ([878ebef](https://github.com/jalibu/MMM-RAIN-MAP/commit/878ebef2c653bfadcc0c813f43f1dec3cc9c4caf))
+* update GitHub Actions ([eadede0](https://github.com/jalibu/MMM-RAIN-MAP/commit/eadede0213cc70311733e3b78c54d680d91042d5))
 ## [3.0.5](https://github.com/jalibu/MMM-RAIN-MAP/compare/v3.0.4...v3.0.5) (2026-06-15)
 
 
