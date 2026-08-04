@@ -24,6 +24,7 @@ function extractDefaults() {
 
   // Parse individual values directly from the source file
   const patterns = [
+    { key: 'provider', regex: /provider:\s*'([^']+)'/ },
     { key: 'animationSpeedMs', regex: /animationSpeedMs:\s*(\d+)/ },
     { key: 'defaultZoomLevel', regex: /defaultZoomLevel:\s*(\d+)/ },
     { key: 'maxHistoryFrames', regex: /maxHistoryFrames:\s*(-?\d+)/ },
@@ -34,7 +35,7 @@ function extractDefaults() {
   for (const { key, regex } of patterns) {
     const match = content.match(regex)
     if (match) {
-      defaults[key] = parseInt(match[1], 10)
+      defaults[key] = key === 'provider' ? match[1] : parseInt(match[1], 10)
     }
   }
 
@@ -52,6 +53,10 @@ describe('MMM-RAIN-MAP Configuration', () => {
 
     test('animationSpeedMs is set to 800 (optimized for API load)', () => {
       assert.equal(defaults.animationSpeedMs, 800)
+    })
+
+    test('provider defaults to RainViewer', () => {
+      assert.equal(defaults.provider, 'rainviewer')
     })
 
     test('defaultZoomLevel is set to 6 (optimized for API load)', () => {

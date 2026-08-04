@@ -2,7 +2,7 @@
 
 [![version](https://img.shields.io/github/package-json/v/jalibu/MMM-RAIN-MAP)](https://github.com/jalibu/MMM-RAIN-MAP/releases) [![Known Vulnerabilities](https://snyk.io/test/github/jalibu/MMM-RAIN-MAP/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jalibu/MMM-RAIN-MAP?targetFile=package.json)
 
-A Rain Radar Map based on the [Rainviewer API](https://www.rainviewer.com/) for the [MagicMirror²](https://magicmirror.builders/) platform.
+A rain radar map for the [MagicMirror²](https://magicmirror.builders/) platform. Supports the [RainViewer API](https://www.rainviewer.com/) and [LibreWXR](https://github.com/JoshuaKimsey/LibreWXR).
 
 Click here for the [Forum Thread](https://forum.magicmirror.builders/topic/12808/mmm-rain-map).
 
@@ -14,9 +14,10 @@ If you also like this module and want to thank, please rate this repository with
 
 ## Features
 
-- Displays Rainviewer.com radar layers on OpenStreetMap
+- Displays radar layers from RainViewer or LibreWXR on OpenStreetMap
   - Every 10 minutes a new weather snapshot is published
   - The snapshots of the last 2 hours are available, which show the weather events of the past
+- LibreWXR can provide forecast frames and supports self-hosted deployments
 - Option to place multiple markers on map
 - Option for multiple, alternating map positions
 - Option to only show in current rainy weather conditions. Works only together with [weather](https://github.com/MagicMirrorOrg/MagicMirror/tree/master/modules/default/weather) or [MMM-OpenWeatherForecast](https://github.com/jclarke0000/MMM-OpenWeatherForecast) as dependency.
@@ -67,6 +68,10 @@ Add the module configuration into the `MagicMirror/config/config.js` file:
           { lat: 49.15, lng: 6.154, zoom: 4, loops: 2 }
         ],
         mapUrl: "https://a.tile.openstreetmap.de/{z}/{x}/{y}.png",
+        provider: "rainviewer",
+        // For a self-hosted LibreWXR instance, use:
+        // provider: "librewxr",
+        // providerUrl: "http://192.168.1.20:8080",
         mapHeight: "420px", // must be a pixel value (no percent)
         mapWidth: "420px", // must be a pixel value (no percent)
         maxHistoryFrames: 6,
@@ -96,11 +101,39 @@ Add the module configuration into the `MagicMirror/config/config.js` file:
 | `mapHeight`                | Height of the map. Must be string with pixels and "px" postfix. Percentage values won't work.<br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `mapWidth`                 | Width of the map. Must be a string with pixels and "px" postfix. Percentage values won't work.<br><br>**Type:** `string` (pixels) <br> **Default value:** `'420px'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `mapUrl`                   | Option to use an alternative map. In most cases you are fine with the default but you can find more maps [here](https://wiki.openstreetmap.org/wiki/Tile_servers).<br><br>**Type:** `string`<br> **Default value:** `'https://a.tile.openstreetmap.de/{z}/{x}/{y}.png'`<br>**Official OSM server:** `'https://tile.openstreetmap.org/{z}/{x}/{y}.png'`<br>**Alternative uncolored map:** `'https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png'`                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `provider`                 | Radar data provider.<br><br>**Possible values:** `'rainviewer'`, `'librewxr'`<br>**Type:** `string`<br> **Default value:** `'rainviewer'`<br><br>LibreWXR uses `https://api.librewxr.net` by default. Set `providerUrl` to use a local or self-hosted LibreWXR instance.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `providerUrl`              | Base URL for a LibreWXR instance. Only used when `provider` is `'librewxr'`.<br><br>**Type:** `string`<br> **Default value:** `'https://api.librewxr.net'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `maxHistoryFrames`         | Maximum number of history frames. There is one frame every 10 minutes. Setting this to 6 would show history radar layers of the last hour until now. If set to -1, all available history frames are shown.<br>As of today, the **API provides 12 history frames** -> 2h.<br><br>**Type:** `int` <br> **Default value:** `6` (1 hour of history to reduce API load)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `maxForecastFrames`        | ⚠️ **CURRENTLY UNAVAILABLE**: RainViewer's free API no longer provides forecast/nowcast data.<br><br>**Type:** `int` <br> **Default value:** `0`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `substituteModules`        | (Experimental) If `displayHoursBeforeRain` is set to `0` or higher, you can define a list of module names that are hidden in favor of the map. <br><br>**Type:** `array[string]` <br> **Default value:** `[]` <br> **Example:** `['MMM-Jast', 'calendar']`<br>Legacy alias: `substitudeModules` (deprecated)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `timeFormat`               | Option to override the MagicMirror's global time format to 12 or 24 for this module. <br><br>**Type:** `int` <br> **Default value:** `[Global Config]` or `24`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `updateIntervalInSeconds`  | Update interval for fetching new radar frames from the RainViewer.com API. (New frames are released every 10 minutes) <br><br>**Type:** `int` <br> **Default value:** `600` (10 minutes in seconds to align with API update frequency)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+
+Forecast availability depends on the selected provider. RainViewer's free API currently does not provide forecast frames, while LibreWXR can provide them when available from its configured data sources.
+
+### Providers
+
+RainViewer is used by default:
+
+```javascript
+provider: 'rainviewer'
+```
+
+To use the public LibreWXR service:
+
+```javascript
+provider: 'librewxr'
+providerUrl: 'https://api.librewxr.net'
+```
+
+To use a self-hosted LibreWXR instance, set `providerUrl` to its base URL:
+
+```javascript
+provider: 'librewxr'
+providerUrl: 'http://192.168.1.20:8080'
+```
+
+`providerUrl` is only used with `provider: "librewxr"`. Both providers use the same frame format, so the remaining module configuration is unchanged.
 
 ## Update the module
 

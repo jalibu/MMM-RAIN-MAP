@@ -6,8 +6,38 @@ import { WeatherPayload, CurrentWeatherPayload, OpenWeatherPayload } from '../ty
 
 // Global or injected variable declarations
 
+const radarProviders = {
+  rainviewer: {
+    apiUrl: 'https://api.rainviewer.com/public/weather-maps.json',
+    tileUrl: 'https://tilecache.rainviewer.com',
+    maxZoom: 7
+  },
+  librewxr: {
+    apiUrl: 'https://api.librewxr.net/public/weather-maps.json',
+    tileUrl: 'https://api.librewxr.net',
+    maxZoom: Infinity
+  }
+} as const
+
+function getRadarProvider(config: Config) {
+  const provider = config.provider || 'rainviewer'
+  const defaults = radarProviders[provider] || radarProviders.rainviewer
+  const baseUrl = config.providerUrl?.replace(/\/$/, '')
+
+  if (provider === 'librewxr' && baseUrl) {
+    return {
+      ...defaults,
+      apiUrl: `${baseUrl}/public/weather-maps.json`,
+      tileUrl: baseUrl
+    }
+  }
+
+  return defaults
+}
+
 Module.register<Config>('MMM-RAIN-MAP', {
   defaults: {
+    provider: 'rainviewer',
     animationSpeedMs: 800,
     colorizeTime: true,
     colorScheme: 2,
@@ -171,8 +201,9 @@ Module.register<Config>('MMM-RAIN-MAP', {
       )
     }
 
+    const radarProvider = getRadarProvider(this.config)
     const configuredColorScheme = this.config.colorScheme
-    if (configuredColorScheme !== 2) {
+    if (radarProvider === radarProviders.rainviewer && configuredColorScheme !== 2) {
       Log.warn(
         `MMM-RAIN-MAP: colorScheme ${configuredColorScheme} is ignored for RainViewer free API. Using colorScheme 2 (Universal Blue).`
       )
@@ -180,7 +211,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     }
 
     // Warn about forecast unavailability once at startup
-    if (this.config.maxForecastFrames > 0) {
+    if (radarProvider === radarProviders.rainviewer && this.config.maxForecastFrames > 0) {
       Log.warn(
         'MMM-RAIN-MAP: Forecast frames are currently unavailable. ' +
           "RainViewer's free API no longer provides forecast/nowcast data. " +
@@ -188,15 +219,15 @@ Module.register<Config>('MMM-RAIN-MAP', {
       )
     }
 
-    const maxZoom = 7
-    if (this.config.defaultZoomLevel > maxZoom) {
+    const maxZoom = radarProvider.maxZoom
+    if (maxZoom !== Infinity && this.config.defaultZoomLevel > maxZoom) {
       Log.warn(
         `MMM-RAIN-MAP: defaultZoomLevel ${this.config.defaultZoomLevel} exceeds the maximum zoom level supported by the RainViewer radar tile API (${maxZoom}). Clamping to ${maxZoom}.`
       )
       this.config.defaultZoomLevel = maxZoom
     }
     for (const position of this.config.mapPositions) {
-      if (position.zoom !== undefined && position.zoom > maxZoom) {
+      if (maxZoom !== Infinity && position.zoom !== undefined && position.zoom > maxZoom) {
         Log.warn(
           `MMM-RAIN-MAP: zoom ${position.zoom} in mapPositions exceeds the maximum zoom level supported by the RainViewer radar tile API (${maxZoom}). Clamping to ${maxZoom}.`
         )
@@ -323,7 +354,8 @@ Module.register<Config>('MMM-RAIN-MAP', {
     this.runtimeData.abortController = new AbortController()
 
     try {
-      const response = await fetch('https://api.rainviewer.com/public/weather-maps.json', {
+      const radarProvider = getRadarProvider(this.config)
+      const response = await fetch(radarProvider.apiUrl, {
         signal: this.runtimeData.abortController.signal,
         cache: 'no-store'
       })
@@ -373,7 +405,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
       // Add new radar layers
       for (const timeframe of this.runtimeData.timeframes) {
         const radarLayer = new L.TileLayer(
-          `https://tilecache.rainviewer.com${timeframe.path}/256/{z}/{x}/{y}/${this.config.colorScheme}/1_1.png`,
+          `${radarProvider.tileUrl}${timeframe.path}/256/{z}/{x}/{y}/${this.config.colorScheme}/1_1.png`,
           {
             tileSize: 256,
             opacity: 0.001,

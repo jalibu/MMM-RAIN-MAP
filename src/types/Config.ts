@@ -1,4 +1,6 @@
 export interface Config {
+  provider?: 'rainviewer' | 'librewxr'
+  providerUrl?: string
   animationSpeedMs: number
   colorizeTime: boolean
   colorScheme: number
