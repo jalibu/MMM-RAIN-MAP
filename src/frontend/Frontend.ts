@@ -68,6 +68,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     mapWidth: '420px',
     maxHistoryFrames: 6,
     maxForecastFrames: 0, // Forecast currently unavailable in RainViewer free API
+    radarOpacity: 1,
     timeFormat: config.timeFormat || 24,
     timezone: null,
     updateIntervalInSeconds: 600
@@ -210,6 +211,14 @@ Module.register<Config>('MMM-RAIN-MAP', {
       this.config.colorScheme = 2
     }
 
+    if (!Number.isFinite(this.config.radarOpacity)) {
+      Log.warn('MMM-RAIN-MAP: radarOpacity must be a number between 0 and 1. Using the default value 1.')
+      this.config.radarOpacity = 1
+    } else if (this.config.radarOpacity < 0 || this.config.radarOpacity > 1) {
+      Log.warn(`MMM-RAIN-MAP: radarOpacity ${this.config.radarOpacity} is outside the range 0-1. Clamping it.`)
+      this.config.radarOpacity = Math.min(1, Math.max(0, this.config.radarOpacity))
+    }
+
     // Warn about forecast unavailability once at startup
     if (radarProvider === radarProviders.rainviewer && this.config.maxForecastFrames > 0) {
       Log.warn(
@@ -306,7 +315,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
     const nextRadarLayer = this.runtimeData.radarLayers.get(nextTimeframe.time)
 
     if (nextRadarLayer) {
-      nextRadarLayer.setOpacity(1)
+      nextRadarLayer.setOpacity(this.config.radarOpacity)
     }
     if (currentRadarLayer) {
       currentRadarLayer.setOpacity(0.001)
@@ -408,8 +417,8 @@ Module.register<Config>('MMM-RAIN-MAP', {
           `${radarProvider.tileUrl}${timeframe.path}/256/{z}/{x}/{y}/${this.config.colorScheme}/1_1.png`,
           {
             tileSize: 256,
-            opacity: 0.001,
-            zIndex: timeframe
+            opacity: timeframe.time === this.runtimeData.timeframes[0].time ? this.config.radarOpacity : 0.001,
+            zIndex: 2
           }
         )
         this.runtimeData.radarLayers.set(timeframe.time, radarLayer)

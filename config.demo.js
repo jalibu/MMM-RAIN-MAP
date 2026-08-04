@@ -30,7 +30,8 @@ const config = {
       header: 'RainViewer',
       position: 'top_left',
       config: {
-        provider: 'rainviewer'
+        provider: 'rainviewer',
+        radarOpacity: 0.9
       }
     },
     {
@@ -39,7 +40,8 @@ const config = {
       position: 'top_right',
       config: {
         provider: 'librewxr',
-        providerUrl: 'https://api.librewxr.net'
+        providerUrl: 'https://api.librewxr.net',
+        radarOpacity: 0.9
       }
     }
   ]

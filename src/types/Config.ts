@@ -15,6 +15,7 @@ export interface Config {
   extraDelayCurrentFrameMs: number
   invertColors: boolean
   markers: Marker[]
+  radarOpacity: number
   mapPositions: MapPosition[]
   mapUrl: string
   mapHeight: string

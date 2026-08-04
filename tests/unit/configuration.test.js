@@ -29,6 +29,7 @@ function extractDefaults() {
     { key: 'defaultZoomLevel', regex: /defaultZoomLevel:\s*(\d+)/ },
     { key: 'maxHistoryFrames', regex: /maxHistoryFrames:\s*(-?\d+)/ },
     { key: 'maxForecastFrames', regex: /maxForecastFrames:\s*(-?\d+)/ },
+    { key: 'radarOpacity', regex: /radarOpacity:\s*(\d+(?:\.\d+)?)/ },
     { key: 'updateIntervalInSeconds', regex: /updateIntervalInSeconds:\s*(\d+)/ }
   ]
 
@@ -69,6 +70,10 @@ describe('MMM-RAIN-MAP Configuration', () => {
 
     test('maxForecastFrames is set to 0 (forecast unavailable in free API)', () => {
       assert.equal(defaults.maxForecastFrames, 0)
+    })
+
+    test('radarOpacity defaults to fully opaque', () => {
+      assert.equal(defaults.radarOpacity, 1)
     })
 
     test('updateIntervalInSeconds is set to 600 (aligned with API)', () => {
