@@ -53,18 +53,18 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/leaflet": "^1.9.22",
     "@types/magicmirror-module": "^2.16.6",
-    "commit-and-tag-version": "^13.1.2",
-    "eslint": "^10.8.0",
+    "commit-and-tag-version": "^13.2.1",
+    "eslint": "^10.10.0",
     "leaflet": "^1.9.4",
-    "lint-staged": "^17.3.0",
-    "prettier": "^3.9.6",
-    "rollup": "^4.62.4",
-    "simple-git-hooks": "^2.13.1",
+    "lint-staged": "^17.5.1",
+    "prettier": "^3.9.7",
+    "rollup": "^4.63.3",
+    "simple-git-hooks": "^2.14.0",
     "tslib": "^2.8.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.66.0"
+    "typescript-eslint": "^8.70.0"
   },
   "allowScripts": {
-    "simple-git-hooks@2.13.1": true
+    "simple-git-hooks@2.14.0": true
   }
 }
