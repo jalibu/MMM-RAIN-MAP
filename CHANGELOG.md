@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.2.0](https://github.com/jalibu/MMM-RAIN-MAP/compare/v3.1.0...v3.2.0) (2026-09-16)
+
+### Added
+
+* **weather:** add OpenWeatherMapForecast support ([def99ad](https://github.com/jalibu/MMM-RAIN-MAP/commit/def99ad52c7dea41dc49840e374e8bae04642e13))
+
+### Fixed
+
+* **weather:** harden notification payload handling ([90d97fb](https://github.com/jalibu/MMM-RAIN-MAP/commit/90d97fb7912a6d19b3ebf8b9d482e2255069b0e0))
+
+### Documentation
+
+* update OpenWeatherForecast fork link ([f8766f3](https://github.com/jalibu/MMM-RAIN-MAP/commit/f8766f38f8ec497ba8fdc9a0e3b5657a638973fb))
+
+### Chores
+
+* update devDependencies ([eb48efe](https://github.com/jalibu/MMM-RAIN-MAP/commit/eb48efe31e5fcd460b96a0e2ebda24eb5651e688))
+
+### Code Refactoring
+
+* **scheduler:** use non-overlapping update loop ([a866c2e](https://github.com/jalibu/MMM-RAIN-MAP/commit/a866c2e95b5563efaac26fb05dde1cec064192d9))
+* **weather:** simplify notification handling ([4315a5e](https://github.com/jalibu/MMM-RAIN-MAP/commit/4315a5e1cda84a789a481b514a7269aaba3a70a1))
+
 ## [3.1.0](https://github.com/jalibu/MMM-RAIN-MAP/compare/v3.0.5...v3.1.0) (2026-08-04)
 
 ### Added
