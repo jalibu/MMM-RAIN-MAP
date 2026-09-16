@@ -489,6 +489,19 @@ Module.register<Config>('MMM-RAIN-MAP', {
     notificationIdentifier: string,
     payload: WeatherPayload | CurrentWeatherPayload | OpenWeatherPayload
   ) {
+    // MagicMirror's core broadcasts notifications without a try/catch, so one bad
+    // payload here would otherwise stop delivery to every other module as well.
+    try {
+      this.dispatchNotification(notificationIdentifier, payload)
+    } catch (err) {
+      Log.error(`MMM-RAIN-MAP: Failed to handle notification "${notificationIdentifier}"`, err)
+    }
+  },
+
+  dispatchNotification(
+    notificationIdentifier: string,
+    payload: WeatherPayload | CurrentWeatherPayload | OpenWeatherPayload
+  ) {
     if (this.config.displayHoursBeforeRain < 0) {
       return
     }
@@ -523,7 +536,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
   handleWeatherUpdate(update: WeatherPayload) {
     const hourlyData = update.hourlyArray
-    if (!hourlyData) {
+    if (!Array.isArray(hourlyData)) {
       return
     }
     let closestRain = Infinity

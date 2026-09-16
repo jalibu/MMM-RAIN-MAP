@@ -1,3 +1,5 @@
+/* global Log */
+
 const assert = require('node:assert/strict')
 const { test, describe } = require('node:test')
 const fs = require('node:fs')
@@ -112,6 +114,9 @@ function handleCurrentWeatherCondition(module, currentCondition) {
  */
 function handleWeatherUpdate(module, update) {
   const hourlyData = update.hourlyArray
+  if (!Array.isArray(hourlyData)) {
+    return
+  }
   let closestRain = Infinity
   const now = Date.now()
 
@@ -129,6 +134,17 @@ function handleWeatherUpdate(module, update) {
     handleCurrentWeatherCondition(module, 'rain')
   } else {
     handleCurrentWeatherCondition(module, '')
+  }
+}
+
+/**
+ * Simplified version of notificationReceived from Frontend.ts
+ */
+function notificationReceived(module, notificationIdentifier, payload) {
+  try {
+    module.dispatchNotification(notificationIdentifier, payload)
+  } catch (err) {
+    Log.error(`MMM-RAIN-MAP: Failed to handle notification "${notificationIdentifier}"`, err)
   }
 }
 
@@ -315,6 +331,40 @@ describe('handleWeatherUpdate', () => {
 
     assert.equal(module.runtimeData.isHiddenDueToNoRain, true, 'should hide when no data available')
     assert.equal(module._calls.hide.length, 1)
+  })
+
+  test('ignores non-array hourlyArray', () => {
+    const module = createMockModule({ displayHoursBeforeRain: 2 })
+
+    assert.doesNotThrow(() => handleWeatherUpdate(module, { hourlyArray: null }))
+    assert.equal(module.runtimeData.isHiddenDueToNoRain, false, 'should leave visibility unchanged')
+  })
+})
+
+describe('notificationReceived', () => {
+  test('isolates dispatch errors and logs the notification identifier', () => {
+    const errors = []
+    const originalLogError = Log.error
+    Log.error = (message, error) => errors.push({ message, error })
+    const dispatchError = new Error('invalid weather payload')
+    const module = {
+      dispatchNotification() {
+        throw dispatchError
+      }
+    }
+
+    try {
+      assert.doesNotThrow(() => notificationReceived(module, 'WEATHER_UPDATED', null))
+    } finally {
+      Log.error = originalLogError
+    }
+
+    assert.deepEqual(errors, [
+      {
+        message: 'MMM-RAIN-MAP: Failed to handle notification "WEATHER_UPDATED"',
+        error: dispatchError
+      }
+    ])
   })
 })
 
