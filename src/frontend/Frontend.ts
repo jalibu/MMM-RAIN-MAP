@@ -480,7 +480,10 @@ Module.register<Config>('MMM-RAIN-MAP', {
         changeSubstituteModuleVisibility(false, this.config)
       }
       if (this.config.displayHoursBeforeRain === 0) {
-        if (notificationIdentifier === 'OPENWEATHER_FORECAST_WEATHER_UPDATE') {
+        if (
+          notificationIdentifier === 'OPENWEATHER_FORECAST_WEATHER_UPDATE' ||
+          notificationIdentifier === 'OPENWEATHER_ONE_CALL_FORECAST_WEATHER_UPDATE'
+        ) {
           const currentCondition = (payload as OpenWeatherPayload).current?.weather?.[0]?.icon
           this.handleCurrentWeatherCondition(currentCondition)
         } else if (notificationIdentifier === 'CURRENTWEATHER_TYPE') {
