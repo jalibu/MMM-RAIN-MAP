@@ -78,7 +78,8 @@ Module.register<Config>('MMM-RAIN-MAP', {
    * Runtime state for the rain map animation.
    * @property {number} animationPosition - Current frame index in animation
    * @property {number|null} animationTimer - setTimeout ID for animation loop
-   * @property {number|null} updateInterval - setInterval ID for data updates
+   * @property {number|null} updateTimer - setTimeout ID for the next data update
+   * @property {number} updateCycleId - Identifies the active update loop
    * @property {AbortController|null} abortController - Controller to cancel pending fetches
    * @property {L.Map|null} map - Leaflet map instance
    * @property {number} mapPosition - Current index in mapPositions array
@@ -98,7 +99,8 @@ Module.register<Config>('MMM-RAIN-MAP', {
   runtimeData: {
     animationPosition: 0,
     animationTimer: null,
-    updateInterval: null,
+    updateTimer: null,
+    updateCycleId: 0,
     abortController: null,
     map: null,
     mapPosition: 0,
@@ -244,15 +246,26 @@ Module.register<Config>('MMM-RAIN-MAP', {
       }
     }
 
-    this.scheduleUpdate()
+    this.startUpdateLoop()
     this.play()
   },
 
-  scheduleUpdate() {
-    this.loadData()
-    this.runtimeData.updateInterval = setInterval(() => {
-      this.loadData()
-    }, this.config.updateIntervalInSeconds * 1000)
+  startUpdateLoop() {
+    if (this.runtimeData.updateTimer) {
+      clearTimeout(this.runtimeData.updateTimer)
+    }
+    const updateCycleId = ++this.runtimeData.updateCycleId
+    this.runtimeData.updateTimer = null
+
+    void this.loadData().finally(() => {
+      // Skip if suspend()/resume() started a newer cycle while this fetch was in flight
+      if (this.runtimeData.updateCycleId !== updateCycleId) {
+        return
+      }
+      this.runtimeData.updateTimer = setTimeout(() => {
+        this.startUpdateLoop()
+      }, this.config.updateIntervalInSeconds * 1000)
+    })
   },
 
   play() {
@@ -457,9 +470,10 @@ Module.register<Config>('MMM-RAIN-MAP', {
       this.runtimeData.animationTimer = null
     }
     // Clear update interval
-    if (this.runtimeData.updateInterval) {
-      clearInterval(this.runtimeData.updateInterval)
-      this.runtimeData.updateInterval = null
+    this.runtimeData.updateCycleId++
+    if (this.runtimeData.updateTimer) {
+      clearTimeout(this.runtimeData.updateTimer)
+      this.runtimeData.updateTimer = null
     }
     // Abort pending fetch
     this.runtimeData.abortController?.abort()
@@ -467,7 +481,7 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
   resume() {
     // Restart update cycle and animation
-    this.scheduleUpdate()
+    this.startUpdateLoop()
     this.play()
   },
 
