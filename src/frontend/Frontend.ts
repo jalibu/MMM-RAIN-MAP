@@ -475,26 +475,35 @@ Module.register<Config>('MMM-RAIN-MAP', {
     notificationIdentifier: string,
     payload: WeatherPayload | CurrentWeatherPayload | OpenWeatherPayload
   ) {
-    if (this.config.displayHoursBeforeRain >= 0) {
-      if (notificationIdentifier === 'DOM_OBJECTS_CREATED') {
+    if (this.config.displayHoursBeforeRain < 0) {
+      return
+    }
+
+    switch (notificationIdentifier) {
+      case 'DOM_OBJECTS_CREATED':
         changeSubstituteModuleVisibility(false, this.config)
-      }
-      if (this.config.displayHoursBeforeRain === 0) {
-        if (
-          notificationIdentifier === 'OPENWEATHER_FORECAST_WEATHER_UPDATE' ||
-          notificationIdentifier === 'OPENWEATHER_ONE_CALL_FORECAST_WEATHER_UPDATE'
-        ) {
-          const currentCondition = (payload as OpenWeatherPayload).current?.weather?.[0]?.icon
-          this.handleCurrentWeatherCondition(currentCondition)
-        } else if (notificationIdentifier === 'CURRENTWEATHER_TYPE') {
+        break
+
+      case 'CURRENTWEATHER_TYPE':
+        if (this.config.displayHoursBeforeRain === 0) {
           const currentCondition = (payload as CurrentWeatherPayload).type
           this.handleCurrentWeatherCondition(currentCondition)
         }
-      } else if (this.config.displayHoursBeforeRain > 0) {
-        if (notificationIdentifier === 'WEATHER_UPDATED') {
+        break
+
+      case 'OPENWEATHER_FORECAST_WEATHER_UPDATE':
+      case 'OPENWEATHER_ONE_CALL_FORECAST_WEATHER_UPDATE':
+        if (this.config.displayHoursBeforeRain === 0) {
+          const currentCondition = (payload as OpenWeatherPayload).current?.weather?.[0]?.icon
+          this.handleCurrentWeatherCondition(currentCondition)
+        }
+        break
+
+      case 'WEATHER_UPDATED':
+        if (this.config.displayHoursBeforeRain > 0) {
           this.handleWeatherUpdate(payload as WeatherPayload)
         }
-      }
+        break
     }
   },
 
