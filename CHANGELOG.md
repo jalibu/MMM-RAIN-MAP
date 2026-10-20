@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.3.0](https://github.com/jalibu/MMM-RAIN-MAP/compare/v3.2.0...v3.3.0) (2026-10-20)
+
+### Added
+
+* **config:** add module config schema ([4bf73cb](https://github.com/jalibu/MMM-RAIN-MAP/commit/4bf73cbf71014a2f5ec7c41b6b4fd98b687558f7))
+
+### Fixed
+
+* **retry:** respect Retry-After on 429 ([34f1d38](https://github.com/jalibu/MMM-RAIN-MAP/commit/34f1d38258e6c8e712bb54518d082efafabcea0b))
+* **timeline:** handle empty radar frames ([f096046](https://github.com/jalibu/MMM-RAIN-MAP/commit/f096046684b7fc5ca20eddfe45ae6c099b899e42))
+
+### Documentation
+
+* add prettier-ignore comment for module config ([b507a3b](https://github.com/jalibu/MMM-RAIN-MAP/commit/b507a3bd5cb4ce40669cb6198fa593b0c8d868e5))
+
+### Chores
+
+* update devDependencies ([6ac50da](https://github.com/jalibu/MMM-RAIN-MAP/commit/6ac50da8346ec298b8d0e821a6b84642062e2457))
+
+### Build System
+
+* **leaflet:** adopt 2.0.0-alpha.1 ([9f8ec76](https://github.com/jalibu/MMM-RAIN-MAP/commit/9f8ec768b42e58b3e89a21bfec1ef50d389a24ad))
+
 ## [3.2.0](https://github.com/jalibu/MMM-RAIN-MAP/compare/v3.1.0...v3.2.0) (2026-09-16)
 
 ### Added
