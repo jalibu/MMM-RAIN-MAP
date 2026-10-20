@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "provider": { "type": "string", "enum": ["rainviewer", "librewxr"] },
+    "providerUrl": { "type": "string", "description": "Optional base URL for the selected radar provider" },
+    "animationSpeedMs": { "type": "integer", "minimum": 0 },
+    "colorizeTime": { "type": "boolean" },
+    "colorScheme": { "type": "integer" },
+    "defaultZoomLevel": { "type": "number" },
+    "displayClockSymbol": { "type": "boolean" },
+    "displayTime": { "type": "boolean" },
+    "displayTimeline": { "type": "boolean" },
+    "displayHoursBeforeRain": {
+      "type": "number",
+      "description": "Hide the map when no rain is expected within this many hours; negative disables hiding"
+    },
+    "invertColors": { "type": "boolean" },
+    "substituteModules": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Modules hidden while the rain map is active"
+    },
+    "substitudeModules": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Deprecated misspelled alias; use substituteModules instead"
+    },
+    "extraDelayLastFrameMs": { "type": "integer", "minimum": 0 },
+    "extraDelayCurrentFrameMs": { "type": "integer", "minimum": 0 },
+    "markers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+          "lng": { "type": "number", "minimum": -180, "maximum": 180 },
+          "color": { "type": "string" }
+        },
+        "required": ["lat", "lng"]
+      }
+    },
+    "mapPositions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+          "lng": { "type": "number", "minimum": -180, "maximum": 180 },
+          "zoom": { "type": "number" },
+          "loops": { "type": "integer", "minimum": 1 }
+        },
+        "required": ["lat", "lng", "zoom"]
+      }
+    },
+    "mapUrl": { "type": "string", "description": "Leaflet tile URL template" },
+    "mapHeight": { "type": "string" },
+    "mapWidth": { "type": "string" },
+    "maxHistoryFrames": { "type": "integer", "minimum": 0 },
+    "maxForecastFrames": { "type": "integer", "minimum": 0 },
+    "radarOpacity": { "type": "number", "minimum": 0, "maximum": 1 },
+    "timeFormat": { "type": "integer", "enum": [12, 24] },
+    "timezone": { "type": ["string", "null"] },
+    "updateIntervalInSeconds": {
+      "type": "integer",
+      "minimum": 300,
+      "description": "Radar data refresh interval in seconds"
+    }
+  }
+}
