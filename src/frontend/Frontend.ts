@@ -412,6 +412,20 @@ Module.register<Config>('MMM-RAIN-MAP', {
       }
       this.runtimeData.radarLayers.clear()
 
+      this.runtimeData.animationPosition = 0
+      if (this.runtimeData.timeframes.length === 0) {
+        if (this.runtimeData.timeDiv) {
+          this.runtimeData.timeDiv.textContent = ''
+        }
+        if (this.runtimeData.sliderDiv) {
+          this.runtimeData.sliderDiv.style.left = '0%'
+        }
+        if (this.runtimeData.timelineDiv) {
+          this.runtimeData.timelineDiv.style.background = ''
+        }
+        return
+      }
+
       // Add new radar layers
       for (const timeframe of this.runtimeData.timeframes) {
         const radarLayer = new L.TileLayer(
@@ -427,8 +441,6 @@ Module.register<Config>('MMM-RAIN-MAP', {
           this.runtimeData.map.addLayer(radarLayer)
         }
       }
-
-      this.runtimeData.animationPosition = 0
 
       // Prepare timeline
       if (this.config.displayTimeline) {
