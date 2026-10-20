@@ -41,6 +41,7 @@ git clone https://github.com/jalibu/MMM-RAIN-MAP
 
 Add the module configuration into the `MagicMirror/config/config.js` file:
 
+<!-- prettier-ignore -->
 ```javascript
     {
       module: "MMM-RAIN-MAP",
