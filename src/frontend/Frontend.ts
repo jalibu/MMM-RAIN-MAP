@@ -1,6 +1,7 @@
 import * as L from 'leaflet'
 import * as Log from 'logger'
 import { changeSubstituteModuleVisibility, getIconColor, rainConditions, sanitizeAndFilterFrames } from './Utils'
+import { calculateRetryDelay } from './Retry'
 import { Config } from '../types/Config'
 import { WeatherPayload, CurrentWeatherPayload, OpenWeatherPayload } from '../types/MagicMirror'
 
@@ -262,9 +263,10 @@ Module.register<Config>('MMM-RAIN-MAP', {
       if (this.runtimeData.updateCycleId !== updateCycleId) {
         return
       }
+      const updateDelay = this.runtimeData.nextRetryDelay || this.config.updateIntervalInSeconds * 1000
       this.runtimeData.updateTimer = setTimeout(() => {
         this.startUpdateLoop()
-      }, this.config.updateIntervalInSeconds * 1000)
+      }, updateDelay)
     })
   },
 
@@ -363,14 +365,6 @@ Module.register<Config>('MMM-RAIN-MAP', {
   },
 
   async loadData() {
-    // Apply exponential backoff if previous requests failed
-    if (this.runtimeData.nextRetryDelay > 0) {
-      Log.log(
-        `Waiting ${this.runtimeData.nextRetryDelay}ms before retrying API request (attempt ${this.runtimeData.retryCount + 1})`
-      )
-      await new Promise((resolve) => setTimeout(resolve, this.runtimeData.nextRetryDelay))
-    }
-
     // Abort any pending fetch
     this.runtimeData.abortController?.abort()
     this.runtimeData.abortController = new AbortController()
@@ -382,31 +376,25 @@ Module.register<Config>('MMM-RAIN-MAP', {
         cache: 'no-store'
       })
 
-      if (!response.ok) {
-        // Handle rate limiting with exponential backoff
-        if (response.status === 429) {
-          this.runtimeData.retryCount++
-          const maxRetries = 5
-          if (this.runtimeData.retryCount <= maxRetries) {
-            // Exponential backoff: 1s, 2s, 4s, 8s, 16s
-            this.runtimeData.nextRetryDelay = Math.min(1000 * Math.pow(2, this.runtimeData.retryCount - 1), 30000)
-            Log.warn(
-              `Rate limited (429). Retry ${this.runtimeData.retryCount}/${maxRetries} in ${this.runtimeData.nextRetryDelay}ms`
-            )
-            return
-          } else {
-            Log.error('Max retries exceeded for rate limiting. Stopping further attempts.')
-            this.runtimeData.nextRetryDelay = 60000 // Wait 1 minute before trying again
-            return
-          }
-        }
-        Log.error('Error fetching RainViewer timeframes', response.statusText)
+      if (response.status === 429) {
+        this.runtimeData.retryCount++
+        this.runtimeData.nextRetryDelay = calculateRetryDelay(
+          this.runtimeData.retryCount,
+          response.headers.get('Retry-After')
+        )
+        Log.warn(
+          `Rate limited (429). Retry attempt ${this.runtimeData.retryCount} in ${this.runtimeData.nextRetryDelay}ms`
+        )
         return
       }
 
-      // Success - reset retry counters
       this.runtimeData.retryCount = 0
       this.runtimeData.nextRetryDelay = 0
+
+      if (!response.ok) {
+        Log.error('Error fetching RainViewer timeframes', response.statusText)
+        return
+      }
 
       const results = await response.json()
 
@@ -459,6 +447,8 @@ Module.register<Config>('MMM-RAIN-MAP', {
       if (err instanceof Error && err.name === 'AbortError') {
         return
       }
+      this.runtimeData.retryCount = 0
+      this.runtimeData.nextRetryDelay = 0
       Log.error('Error fetching RainViewer data', err)
     }
   },
