@@ -55,7 +55,7 @@
     "@types/magicmirror-module": "^2.16.6",
     "commit-and-tag-version": "^13.3.0",
     "eslint": "^10.13.0",
-    "leaflet": "^1.9.4",
+    "leaflet": "2.0.0-alpha.1",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
     "rollup": "^4.64.12",

@@ -164,17 +164,17 @@ Module.register<Config>('MMM-RAIN-MAP', {
 
     const firstPosition = this.config.mapPositions[0]
 
-    this.runtimeData.map = L.map(mapDiv, {
+    this.runtimeData.map = new L.Map(mapDiv, {
       zoomControl: false,
       trackResize: false,
       attributionControl: false
     }).setView([firstPosition.lat, firstPosition.lng], firstPosition.zoom)
 
     // Sanitize map URL
-    L.tileLayer(this.config.mapUrl.split('$').join('')).addTo(this.runtimeData.map)
+    new L.TileLayer(this.config.mapUrl.split('$').join('')).addTo(this.runtimeData.map)
 
     for (const marker of this.config.markers) {
-      L.marker([marker.lat, marker.lng], {
+      new L.Marker([marker.lat, marker.lng], {
         icon: new L.Icon({
           iconUrl: this.file(`img/marker-icon-2x-${getIconColor(marker)}.png`),
           shadowUrl: this.file(`img/marker-shadow.png`),
