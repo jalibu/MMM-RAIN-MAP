@@ -62,7 +62,7 @@
     "simple-git-hooks": "^2.14.0",
     "tslib": "^2.8.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.72.0"
+    "typescript-eslint": "^8.72.1"
   },
   "allowScripts": {
     "simple-git-hooks@2.14.0": true
